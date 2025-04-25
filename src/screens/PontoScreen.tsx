@@ -77,6 +77,8 @@ export const PontoScreen: React.FC = () => {
 
   const confirmarRegistroModal = () => {
     setModalVisible(false);
+    if (!horarioRegistro) return;
+
     switch (tipoRegistro) {
       case 'entrada':
         setRegistroTemporario(prev => ({
@@ -184,6 +186,15 @@ export const PontoScreen: React.FC = () => {
     Alert.alert('Sucesso', 'Registro de ponto salvo com sucesso!');
   };
 
+  const todosCamposPreenchidos = () => {
+    return (
+      registroTemporario.entrada &&
+      registroTemporario.entradaAlmoco &&
+      registroTemporario.saidaAlmoco &&
+      registroTemporario.saida
+    );
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Card>
@@ -285,6 +296,7 @@ export const PontoScreen: React.FC = () => {
             <Button
               title="Confirmar"
               onPress={confirmarRegistro}
+              disabled={!todosCamposPreenchidos()}
               style={{ ...styles.button, ...styles.confirmButton }}
             />
             <Button
