@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ClienteScreen } from '../screens/ClienteScreen';
+import { ClienteListaScreen } from '../screens/ClienteListaScreen';
 import { AgendamentoScreen } from '../screens/AgendamentoScreen';
 import { PontoScreen } from '../screens/PontoScreen';
 import { PontoHistoricoScreen } from '../screens/PontoHistoricoScreen';
@@ -16,7 +17,8 @@ import { Agendamento } from '../types';
 // Definição dos tipos para navegação
 export type RootStackParamList = {
   Home: undefined;
-  Clientes: undefined;
+  ClienteLista: undefined;
+  ClienteCadastro: undefined;
   Agendamentos: undefined;
   PontoStack: { screen: string };
   Ponto: undefined;
@@ -31,9 +33,14 @@ const Stack = createStackNavigator<RootStackParamList>();
 const ClienteStack = () => (
   <Stack.Navigator>
     <Stack.Screen 
-      name="Clientes" 
-      component={ClienteScreen}
+      name="ClienteLista" 
+      component={ClienteListaScreen}
       options={{ title: 'Clientes' }}
+    />
+    <Stack.Screen 
+      name="ClienteCadastro" 
+      component={ClienteScreen}
+      options={{ title: 'Cadastro de Cliente' }}
     />
     <Stack.Screen 
       name="ClienteDetalhe" 
@@ -98,7 +105,7 @@ export const AppNavigator = () => {
           }}
         />
         <Tab.Screen 
-          name="Clientes" 
+          name="ClienteLista" 
           component={ClienteStack}
           options={{
             tabBarLabel: 'Clientes',

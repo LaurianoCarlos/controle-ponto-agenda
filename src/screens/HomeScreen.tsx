@@ -18,8 +18,8 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate('PontoStack', { screen: 'HistoricoPonto' });
   };
 
-  const navegarParaCadastroCliente = () => {
-    navigation.navigate('Clientes');
+  const navegarParaClientes = () => {
+    navigation.navigate('ClienteLista');
   };
 
   return (
@@ -52,10 +52,10 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.buttonContainer}>
           <TouchableOpacity 
             style={styles.button}
-            onPress={navegarParaCadastroCliente}
+            onPress={navegarParaClientes}
           >
             <Text style={styles.buttonIcon}>👥</Text>
-            <Text style={styles.buttonText}>Cadastrar Cliente</Text>
+            <Text style={styles.buttonText}>Clientes</Text>
           </TouchableOpacity>
         </View>
       </Card>
