@@ -27,6 +27,8 @@ export const PontoScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [tipoRegistro, setTipoRegistro] = useState<string>('');
   const [horarioRegistro, setHorarioRegistro] = useState<Date | null>(null);
+  const [modalConfirmacaoVisible, setModalConfirmacaoVisible] = useState<boolean>(false);
+  const [acaoConfirmacao, setAcaoConfirmacao] = useState<'confirmar' | 'cancelar'>('confirmar');
 
   const formatarDataParaString = (data: Date): string => {
     return data.toISOString().split('T')[0]; // Converte para YYYY-MM-DD
@@ -195,6 +197,20 @@ export const PontoScreen: React.FC = () => {
     );
   };
 
+  const mostrarModalConfirmacaoFinal = (acao: 'confirmar' | 'cancelar') => {
+    setAcaoConfirmacao(acao);
+    setModalConfirmacaoVisible(true);
+  };
+
+  const confirmarAcaoFinal = () => {
+    setModalConfirmacaoVisible(false);
+    if (acaoConfirmacao === 'confirmar') {
+      confirmarRegistro();
+    } else {
+      cancelarRegistro();
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Card>
@@ -295,13 +311,13 @@ export const PontoScreen: React.FC = () => {
           <View style={styles.confirmacaoContainer}>
             <Button
               title="Confirmar"
-              onPress={confirmarRegistro}
+              onPress={() => mostrarModalConfirmacaoFinal('confirmar')}
               disabled={!todosCamposPreenchidos()}
               style={{ ...styles.button, ...styles.confirmButton }}
             />
             <Button
               title="Cancelar"
-              onPress={cancelarRegistro}
+              onPress={() => mostrarModalConfirmacaoFinal('cancelar')}
               style={{ ...styles.button, ...styles.cancelButton }}
             />
           </View>
@@ -338,6 +354,40 @@ export const PontoScreen: React.FC = () => {
                 onPress={confirmarRegistroModal}
               >
                 <Text style={styles.modalButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalConfirmacaoVisible}
+        onRequestClose={() => setModalConfirmacaoVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>
+              {acaoConfirmacao === 'confirmar' ? 'Confirmar Registro' : 'Cancelar Registro'}
+            </Text>
+            <Text style={styles.modalText}>
+              {acaoConfirmacao === 'confirmar'
+                ? 'Tem certeza que deseja confirmar o registro de ponto?'
+                : 'Tem certeza que deseja cancelar o registro de ponto?'}
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={() => setModalConfirmacaoVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Não</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={confirmarAcaoFinal}
+              >
+                <Text style={styles.modalButtonText}>Sim</Text>
               </TouchableOpacity>
             </View>
           </View>

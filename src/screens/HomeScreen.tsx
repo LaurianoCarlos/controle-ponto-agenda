@@ -18,6 +18,10 @@ export const HomeScreen: React.FC = () => {
     navigation.navigate('PontoStack', { screen: 'HistoricoPonto' });
   };
 
+  const navegarParaCadastroCliente = () => {
+    navigation.navigate('Clientes');
+  };
+
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Bem-vindo ao App Cachos</Text>
@@ -39,6 +43,19 @@ export const HomeScreen: React.FC = () => {
           >
             <Text style={styles.buttonIcon}>📊</Text>
             <Text style={styles.buttonText}>Histórico de Horas</Text>
+          </TouchableOpacity>
+        </View>
+      </Card>
+
+      <Card style={styles.card}>
+        <Text style={styles.cardTitle}>Gestão de Clientes</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.button}
+            onPress={navegarParaCadastroCliente}
+          >
+            <Text style={styles.buttonIcon}>👥</Text>
+            <Text style={styles.buttonText}>Cadastrar Cliente</Text>
           </TouchableOpacity>
         </View>
       </Card>

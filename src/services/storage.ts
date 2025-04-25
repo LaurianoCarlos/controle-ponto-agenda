@@ -2,50 +2,73 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Cliente, Agendamento, Ponto } from '../types';
 
 const STORAGE_KEYS = {
-  CLIENTES: '@app-cachos:clientes',
-  AGENDAMENTOS: '@app-cachos:agendamentos',
-  PONTOS: '@app-cachos:pontos',
+  CLIENTES: '@app_cachos:clientes',
+  AGENDAMENTOS: '@app_cachos:agendamentos',
+  PONTOS: '@app_cachos:pontos',
 };
 
 export const StorageService = {
   // Clientes
-  async getClientes(): Promise<Cliente[]> {
+  getClientes: async (): Promise<Cliente[]> => {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.CLIENTES);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('Erro ao buscar clientes:', error);
+      console.error('Erro ao carregar clientes:', error);
       return [];
     }
   },
 
-  async saveCliente(cliente: Cliente): Promise<void> {
+  saveCliente: async (cliente: Cliente): Promise<void> => {
     try {
-      const clientes = await this.getClientes();
-      const updatedClientes = [...clientes, cliente];
-      await AsyncStorage.setItem(STORAGE_KEYS.CLIENTES, JSON.stringify(updatedClientes));
+      const clientes = await StorageService.getClientes();
+      const index = clientes.findIndex(c => c.id === cliente.id);
+      
+      if (index >= 0) {
+        clientes[index] = cliente;
+      } else {
+        clientes.push(cliente);
+      }
+      
+      await AsyncStorage.setItem(STORAGE_KEYS.CLIENTES, JSON.stringify(clientes));
     } catch (error) {
       console.error('Erro ao salvar cliente:', error);
       throw error;
     }
   },
 
+  saveClientes: async (clientes: Cliente[]): Promise<void> => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.CLIENTES, JSON.stringify(clientes));
+    } catch (error) {
+      console.error('Erro ao salvar lista de clientes:', error);
+      throw error;
+    }
+  },
+
   // Agendamentos
-  async getAgendamentos(): Promise<Agendamento[]> {
+  getAgendamentos: async (): Promise<Agendamento[]> => {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.AGENDAMENTOS);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('Erro ao buscar agendamentos:', error);
+      console.error('Erro ao carregar agendamentos:', error);
       return [];
     }
   },
 
-  async saveAgendamento(agendamento: Agendamento): Promise<void> {
+  saveAgendamento: async (agendamento: Agendamento): Promise<void> => {
     try {
-      const agendamentos = await this.getAgendamentos();
-      const updatedAgendamentos = [...agendamentos, agendamento];
-      await AsyncStorage.setItem(STORAGE_KEYS.AGENDAMENTOS, JSON.stringify(updatedAgendamentos));
+      const agendamentos = await StorageService.getAgendamentos();
+      const index = agendamentos.findIndex(a => a.id === agendamento.id);
+      
+      if (index >= 0) {
+        agendamentos[index] = agendamento;
+      } else {
+        agendamentos.push(agendamento);
+      }
+      
+      await AsyncStorage.setItem(STORAGE_KEYS.AGENDAMENTOS, JSON.stringify(agendamentos));
     } catch (error) {
       console.error('Erro ao salvar agendamento:', error);
       throw error;
@@ -53,26 +76,24 @@ export const StorageService = {
   },
 
   // Pontos
-  async getPontos(): Promise<Ponto[]> {
+  getPontos: async (): Promise<Ponto[]> => {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.PONTOS);
       return data ? JSON.parse(data) : [];
     } catch (error) {
-      console.error('Erro ao buscar pontos:', error);
+      console.error('Erro ao carregar pontos:', error);
       return [];
     }
   },
 
-  async savePonto(ponto: Ponto): Promise<void> {
+  savePonto: async (ponto: Ponto): Promise<void> => {
     try {
-      const pontos = await this.getPontos();
-      const pontoExistente = pontos.findIndex(p => p.data === ponto.data);
+      const pontos = await StorageService.getPontos();
+      const index = pontos.findIndex(p => p.data === ponto.data);
       
-      if (pontoExistente >= 0) {
-        // Atualiza o ponto existente
-        pontos[pontoExistente] = ponto;
+      if (index >= 0) {
+        pontos[index] = ponto;
       } else {
-        // Adiciona novo ponto
         pontos.push(ponto);
       }
       
@@ -83,18 +104,18 @@ export const StorageService = {
     }
   },
 
-  async deletePonto(data: string): Promise<void> {
+  deletePonto: async (data: string): Promise<void> => {
     try {
-      const pontos = await this.getPontos();
-      const pontosFiltrados = pontos.filter(p => p.data !== data);
-      await AsyncStorage.setItem(STORAGE_KEYS.PONTOS, JSON.stringify(pontosFiltrados));
+      const pontos = await StorageService.getPontos();
+      const pontosAtualizados = pontos.filter(p => p.data !== data);
+      await AsyncStorage.setItem(STORAGE_KEYS.PONTOS, JSON.stringify(pontosAtualizados));
     } catch (error) {
-      console.error('Erro ao deletar ponto:', error);
+      console.error('Erro ao excluir ponto:', error);
       throw error;
     }
   },
 
-  async clearAllData(): Promise<void> {
+  clearAllData: async (): Promise<void> => {
     try {
       await AsyncStorage.multiRemove([
         STORAGE_KEYS.CLIENTES,
