@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
@@ -24,6 +24,9 @@ export const PontoScreen: React.FC = () => {
 
   const [dataSelecionada, setDataSelecionada] = useState<Date>(new Date());
   const [mostrarSeletorData, setMostrarSeletorData] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [tipoRegistro, setTipoRegistro] = useState<string>('');
+  const [horarioRegistro, setHorarioRegistro] = useState<Date | null>(null);
 
   const formatarDataParaString = (data: Date): string => {
     return data.toISOString().split('T')[0]; // Converte para YYYY-MM-DD
@@ -66,37 +69,101 @@ export const PontoScreen: React.FC = () => {
     }
   };
 
+  const mostrarModalConfirmacao = (tipo: string, horario: Date) => {
+    setTipoRegistro(tipo);
+    setHorarioRegistro(horario);
+    setModalVisible(true);
+  };
+
+  const confirmarRegistroModal = () => {
+    setModalVisible(false);
+    switch (tipoRegistro) {
+      case 'entrada':
+        setRegistroTemporario(prev => ({
+          ...prev,
+          entrada: horarioRegistro,
+        }));
+        break;
+      case 'saidaAlmoco':
+        setRegistroTemporario(prev => ({
+          ...prev,
+          entradaAlmoco: horarioRegistro,
+        }));
+        break;
+      case 'voltaAlmoco':
+        setRegistroTemporario(prev => ({
+          ...prev,
+          saidaAlmoco: horarioRegistro,
+        }));
+        break;
+      case 'saida':
+        setRegistroTemporario(prev => ({
+          ...prev,
+          saida: horarioRegistro,
+        }));
+        break;
+    }
+  };
+
   const registrarEntrada = () => {
-    setRegistroTemporario(prev => ({
-      ...prev,
-      entrada: new Date(),
-    }));
-  };
-
-  const registrarSaida = () => {
-    setRegistroTemporario(prev => ({
-      ...prev,
-      saida: new Date(),
-    }));
-  };
-
-  const registrarEntradaAlmoco = () => {
-    setRegistroTemporario(prev => ({
-      ...prev,
-      entradaAlmoco: new Date(),
-    }));
+    if (!registroTemporario.entrada) {
+      mostrarModalConfirmacao('entrada', new Date());
+    }
   };
 
   const registrarSaidaAlmoco = () => {
-    setRegistroTemporario(prev => ({
-      ...prev,
-      saidaAlmoco: new Date(),
-    }));
+    if (!registroTemporario.entrada) {
+      Alert.alert('Erro', 'É necessário registrar a entrada primeiro.');
+      return;
+    }
+    if (!registroTemporario.entradaAlmoco) {
+      mostrarModalConfirmacao('saidaAlmoco', new Date());
+    }
+  };
+
+  const registrarVoltaAlmoco = () => {
+    if (!registroTemporario.entradaAlmoco) {
+      Alert.alert('Erro', 'É necessário registrar a saída para almoço primeiro.');
+      return;
+    }
+    if (!registroTemporario.saidaAlmoco) {
+      mostrarModalConfirmacao('voltaAlmoco', new Date());
+    }
+  };
+
+  const registrarSaida = () => {
+    if (!registroTemporario.saidaAlmoco) {
+      Alert.alert('Erro', 'É necessário registrar a volta do almoço primeiro.');
+      return;
+    }
+    if (!registroTemporario.saida) {
+      mostrarModalConfirmacao('saida', new Date());
+    }
+  };
+
+  const cancelarRegistro = () => {
+    setRegistroTemporario({});
+    Alert.alert('Aviso', 'Registro cancelado.');
   };
 
   const confirmarRegistro = async () => {
     if (!registroTemporario.entrada) {
       Alert.alert('Erro', 'É necessário registrar a entrada primeiro.');
+      return;
+    }
+
+    if (!registroTemporario.entradaAlmoco) {
+      Alert.alert('Erro', 'É necessário registrar a saída para almoço.');
+      return;
+    }
+
+    if (!registroTemporario.saidaAlmoco) {
+      Alert.alert('Erro', 'É necessário registrar a volta do almoço.');
+      return;
+    }
+
+    if (!registroTemporario.saida) {
+      Alert.alert('Erro', 'É necessário registrar a saída.');
       return;
     }
 
@@ -115,11 +182,6 @@ export const PontoScreen: React.FC = () => {
     setRegistroPonto(registroTemporario);
     setRegistroTemporario({});
     Alert.alert('Sucesso', 'Registro de ponto salvo com sucesso!');
-  };
-
-  const cancelarRegistro = () => {
-    setRegistroTemporario({});
-    Alert.alert('Aviso', 'Registro cancelado.');
   };
 
   return (
@@ -148,7 +210,7 @@ export const PontoScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Entrada/Saída</Text>
+          <Text style={styles.sectionTitle}>Registro de Horários</Text>
           <View style={styles.infoContainer}>
             <Text style={styles.label}>Entrada:</Text>
             <Text style={styles.value}>
@@ -156,6 +218,28 @@ export const PontoScreen: React.FC = () => {
                 ? registroTemporario.entrada.toLocaleTimeString()
                 : registroPonto.entrada
                 ? registroPonto.entrada.toLocaleTimeString()
+                : '--:--'}
+            </Text>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Saída Almoço:</Text>
+            <Text style={styles.value}>
+              {registroTemporario.entradaAlmoco
+                ? registroTemporario.entradaAlmoco.toLocaleTimeString()
+                : registroPonto.entradaAlmoco
+                ? registroPonto.entradaAlmoco.toLocaleTimeString()
+                : '--:--'}
+            </Text>
+          </View>
+
+          <View style={styles.infoContainer}>
+            <Text style={styles.label}>Volta Almoço:</Text>
+            <Text style={styles.value}>
+              {registroTemporario.saidaAlmoco
+                ? registroTemporario.saidaAlmoco.toLocaleTimeString()
+                : registroPonto.saidaAlmoco
+                ? registroPonto.saidaAlmoco.toLocaleTimeString()
                 : '--:--'}
             </Text>
           </View>
@@ -172,54 +256,29 @@ export const PontoScreen: React.FC = () => {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Almoço</Text>
-          <View style={styles.infoContainer}>
-            <Text style={styles.label}>Entrada:</Text>
-            <Text style={styles.value}>
-              {registroTemporario.entradaAlmoco
-                ? registroTemporario.entradaAlmoco.toLocaleTimeString()
-                : registroPonto.entradaAlmoco
-                ? registroPonto.entradaAlmoco.toLocaleTimeString()
-                : '--:--'}
-            </Text>
-          </View>
-
-          <View style={styles.infoContainer}>
-            <Text style={styles.label}>Saída:</Text>
-            <Text style={styles.value}>
-              {registroTemporario.saidaAlmoco
-                ? registroTemporario.saidaAlmoco.toLocaleTimeString()
-                : registroPonto.saidaAlmoco
-                ? registroPonto.saidaAlmoco.toLocaleTimeString()
-                : '--:--'}
-            </Text>
-          </View>
-        </View>
-
         <View style={styles.buttonContainer}>
           <Button
-            title="Registrar Entrada"
+            title="1. Registrar Entrada"
             onPress={registrarEntrada}
             disabled={!!registroTemporario.entrada || !!registroPonto.entrada}
             style={styles.button}
           />
           <Button
-            title="Registrar Saída"
-            onPress={registrarSaida}
-            disabled={!registroTemporario.entrada || !!registroTemporario.saida || !!registroPonto.saida}
-            style={styles.button}
-          />
-          <Button
-            title="Registrar Entrada Almoço"
-            onPress={registrarEntradaAlmoco}
-            disabled={!!registroTemporario.entradaAlmoco || !!registroPonto.entradaAlmoco}
-            style={styles.button}
-          />
-          <Button
-            title="Registrar Saída Almoço"
+            title="2. Registrar Saída Almoço"
             onPress={registrarSaidaAlmoco}
-            disabled={!!registroTemporario.saidaAlmoco || !!registroPonto.saidaAlmoco}
+            disabled={!registroTemporario.entrada || !!registroTemporario.entradaAlmoco || !!registroPonto.entradaAlmoco}
+            style={styles.button}
+          />
+          <Button
+            title="3. Registrar Volta Almoço"
+            onPress={registrarVoltaAlmoco}
+            disabled={!registroTemporario.entradaAlmoco || !!registroTemporario.saidaAlmoco || !!registroPonto.saidaAlmoco}
+            style={styles.button}
+          />
+          <Button
+            title="4. Registrar Saída"
+            onPress={registrarSaida}
+            disabled={!registroTemporario.saidaAlmoco || !!registroTemporario.saida || !!registroPonto.saida}
             style={styles.button}
           />
           <View style={styles.confirmacaoContainer}>
@@ -236,6 +295,42 @@ export const PontoScreen: React.FC = () => {
           </View>
         </View>
       </Card>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirmar Registro</Text>
+            <Text style={styles.modalText}>
+              {tipoRegistro === 'entrada' && 'Entrada'}
+              {tipoRegistro === 'saidaAlmoco' && 'Saída para Almoço'}
+              {tipoRegistro === 'voltaAlmoco' && 'Volta do Almoço'}
+              {tipoRegistro === 'saida' && 'Saída'}
+            </Text>
+            <Text style={styles.modalTime}>
+              {horarioRegistro?.toLocaleTimeString()}
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonCancel]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.modalButtonConfirm]}
+                onPress={confirmarRegistroModal}
+              >
+                <Text style={styles.modalButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -310,5 +405,55 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 8,
     backgroundColor: '#f44336',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#6200ee',
+  },
+  modalText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  modalTime: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    padding: 10,
+    borderRadius: 5,
+    width: '45%',
+    alignItems: 'center',
+  },
+  modalButtonCancel: {
+    backgroundColor: '#f44336',
+  },
+  modalButtonConfirm: {
+    backgroundColor: '#4CAF50',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 }); 
