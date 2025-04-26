@@ -40,14 +40,32 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
   );
 
   const handleCalendarDayPress = (day: any) => {
-    const selectedDate = new Date(day.dateString);
+    // Criar uma nova data usando a string da data selecionada
+    // Isso evita problemas de fuso horário
+    const [ano, mes, dia] = day.dateString.split('-').map(Number);
+    const selectedDate = new Date(ano, mes - 1, dia);
     setDataSelecionada(selectedDate);
     setShowCalendar(false);
   };
 
+  // Função para formatar a data para comparação (YYYY-MM-DD)
+  const formatarDataParaComparacao = (data: Date): string => {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const dia = String(data.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  };
+
   const agendamentosFiltrados = agendamentos.filter(agendamento => {
+    // Converter a string de data do agendamento para um objeto Date
     const dataAgendamento = new Date(agendamento.data);
-    return dataAgendamento.toDateString() === dataSelecionada.toDateString();
+    
+    // Formatar ambas as datas para comparação
+    const dataFormatadaAgendamento = formatarDataParaComparacao(dataAgendamento);
+    const dataFormatadaSelecionada = formatarDataParaComparacao(dataSelecionada);
+    
+    // Comparar as strings formatadas
+    return dataFormatadaAgendamento === dataFormatadaSelecionada;
   });
 
   const renderItem = ({ item }: { item: Agendamento }) => (
