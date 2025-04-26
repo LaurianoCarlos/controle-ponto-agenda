@@ -83,7 +83,10 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   const handleCalendarDayPress = (day: any) => {
-    const selectedDate = new Date(day.dateString);
+    // Criar uma nova data usando a string da data selecionada
+    // Isso evita problemas de fuso horário
+    const [ano, mes, dia] = day.dateString.split('-').map(Number);
+    const selectedDate = new Date(ano, mes - 1, dia);
     setData(selectedDate);
     setShowCalendar(false);
     // Atualizar horários ocupados quando a data muda
@@ -107,11 +110,14 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
       return;
     }
 
+    // Formatar a data para evitar problemas de fuso horário
+    const dataFormatada = new Date(data.getFullYear(), data.getMonth(), data.getDate());
+
     const novoAgendamento: Agendamento = {
       id: Date.now().toString(),
       nomeCliente: nomeCliente.trim(),
       telefone: telefone.trim(),
-      data: data.toISOString(),
+      data: dataFormatada.toISOString(),
       hora: hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       servico: servico.trim(),
     };
