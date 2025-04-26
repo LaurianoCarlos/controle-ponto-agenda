@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Agendamento } from '../types';
@@ -19,6 +19,8 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
   const [dataSelecionada, setDataSelecionada] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [markedDates, setMarkedDates] = useState<any>({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [agendamentoParaExcluir, setAgendamentoParaExcluir] = useState<string | null>(null);
 
   const carregarDados = async () => {
     const dadosAgendamentos = await StorageService.getAgendamentos();
@@ -68,17 +70,54 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
     return dataFormatadaAgendamento === dataFormatadaSelecionada;
   });
 
+  const handleExcluirAgendamento = async (id: string) => {
+    setAgendamentoParaExcluir(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmarExclusao = async () => {
+    if (!agendamentoParaExcluir) return;
+
+    try {
+      await StorageService.deleteAgendamento(agendamentoParaExcluir);
+      await carregarDados();
+      setShowDeleteModal(false);
+      setAgendamentoParaExcluir(null);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível excluir o agendamento');
+    }
+  };
+
+  const cancelarExclusao = () => {
+    setShowDeleteModal(false);
+    setAgendamentoParaExcluir(null);
+  };
+
   const renderItem = ({ item }: { item: Agendamento }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
-    >
-      <Card style={styles.cardItem}>
-        <Text style={styles.nome}>{item.nomeCliente}</Text>
-        <Text style={styles.telefone}>{item.telefone}</Text>
-        <Text style={styles.horario}>{item.hora}</Text>
-        <Text style={styles.servico}>{item.servico}</Text>
-      </Card>
-    </TouchableOpacity>
+    <Card style={styles.cardItem}>
+      <View style={styles.cardContent}>
+        <View style={styles.cardInfo}>
+          <Text style={styles.nome}>{item.nomeCliente}</Text>
+          <Text style={styles.telefone}>{item.telefone}</Text>
+          <Text style={styles.horario}>{item.hora}</Text>
+          <Text style={styles.servico}>{item.servico}</Text>
+        </View>
+        <View style={styles.cardActions}>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
+          >
+            <Text style={styles.actionButtonText}>Detalhes</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.deleteButton]}
+            onPress={() => handleExcluirAgendamento(item.id)}
+          >
+            <Text style={styles.actionButtonText}>Excluir</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Card>
   );
 
   return (
@@ -158,6 +197,36 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      <Modal
+        visible={showDeleteModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={cancelarExclusao}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
+            <Text style={styles.modalText}>
+              Tem certeza que deseja excluir este agendamento?
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]} 
+                onPress={cancelarExclusao}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.deleteButton]} 
+                onPress={confirmarExclusao}
+              >
+                <Text style={styles.modalButtonText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -205,6 +274,33 @@ const styles = StyleSheet.create({
   cardItem: {
     marginBottom: 12,
     padding: 16,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    backgroundColor: '#6200ee',
+    padding: 8,
+    borderRadius: 4,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+  },
+  actionButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   nome: {
     fontSize: 16,
@@ -260,6 +356,52 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 20,
+    width: '80%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    gap: 10,
+  },
+  modalButton: {
+    padding: 12,
+    borderRadius: 6,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#666666',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+  },
+  modalButtonText: {
+    color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
   },

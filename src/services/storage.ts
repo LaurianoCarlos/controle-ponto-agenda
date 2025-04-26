@@ -38,11 +38,22 @@ export const StorageService = {
 
   deleteAgendamento: async (id: string): Promise<void> => {
     try {
+      console.log('StorageService: Iniciando exclusão do agendamento', id);
       const agendamentos = await StorageService.getAgendamentos();
+      console.log('StorageService: Total de agendamentos antes da exclusão:', agendamentos.length);
+      
       const agendamentosFiltrados = agendamentos.filter(a => a.id !== id);
+      console.log('StorageService: Total de agendamentos após filtro:', agendamentosFiltrados.length);
+      
+      if (agendamentos.length === agendamentosFiltrados.length) {
+        console.log('StorageService: Nenhum agendamento foi removido, ID não encontrado');
+        throw new Error('Agendamento não encontrado');
+      }
+      
       await AsyncStorage.setItem(STORAGE_KEYS.AGENDAMENTOS, JSON.stringify(agendamentosFiltrados));
+      console.log('StorageService: Agendamento excluído com sucesso');
     } catch (error) {
-      console.error('Erro ao excluir agendamento:', error);
+      console.error('StorageService: Erro ao excluir agendamento:', error);
       throw error;
     }
   },
