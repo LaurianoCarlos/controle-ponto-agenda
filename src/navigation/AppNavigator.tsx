@@ -4,51 +4,24 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { HomeScreen } from '../screens/HomeScreen';
-import { ClienteScreen } from '../screens/ClienteScreen';
-import { ClienteListaScreen } from '../screens/ClienteListaScreen';
 import { AgendamentoScreen } from '../screens/AgendamentoScreen';
 import { PontoScreen } from '../screens/PontoScreen';
 import { PontoHistoricoScreen } from '../screens/PontoHistoricoScreen';
-import { ClienteDetalheScreen } from '../screens/ClienteDetalheScreen';
 import { AgendamentoDetalheScreen } from '../screens/AgendamentoDetalheScreen';
-import { Cliente } from '../types';
 import { Agendamento } from '../types';
 
 // Definição dos tipos para navegação
 export type RootStackParamList = {
   Home: undefined;
-  ClienteLista: undefined;
-  ClienteCadastro: undefined;
   Agendamentos: undefined;
   PontoStack: { screen: string };
   Ponto: undefined;
-  ClienteDetalhe: { cliente: Cliente };
-  AgendamentoDetalhe: { agendamento: Agendamento; cliente: Cliente };
+  AgendamentoDetalhe: { agendamento: Agendamento };
   HistoricoPonto: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
-
-const ClienteStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen 
-      name="ClienteLista" 
-      component={ClienteListaScreen}
-      options={{ title: 'Clientes' }}
-    />
-    <Stack.Screen 
-      name="ClienteCadastro" 
-      component={ClienteScreen}
-      options={{ title: 'Cadastro de Cliente' }}
-    />
-    <Stack.Screen 
-      name="ClienteDetalhe" 
-      component={ClienteDetalheScreen}
-      options={{ title: 'Detalhes do Cliente' }}
-    />
-  </Stack.Navigator>
-);
 
 const AgendamentoStack = () => (
   <Stack.Navigator>
@@ -101,16 +74,6 @@ export const AppNavigator = () => {
             tabBarLabel: 'Início',
             tabBarIcon: ({ color }) => (
               <Text style={{ fontSize: 24, color }}>🏠</Text>
-            ),
-          }}
-        />
-        <Tab.Screen 
-          name="ClienteLista" 
-          component={ClienteStack}
-          options={{
-            tabBarLabel: 'Clientes',
-            tabBarIcon: ({ color }) => (
-              <Text style={{ fontSize: 24, color }}>👥</Text>
             ),
           }}
         />
