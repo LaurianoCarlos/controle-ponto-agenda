@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Agendamento } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { RouteProp } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 type AgendamentoDetalheScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AgendamentoDetalhe'>;
 type AgendamentoDetalheScreenRouteProp = RouteProp<RootStackParamList, 'AgendamentoDetalhe'>;
@@ -18,27 +19,20 @@ interface Props {
 export const AgendamentoDetalheScreen: React.FC<Props> = ({ navigation, route }) => {
   const { agendamento } = route.params;
 
-  const handleExcluir = async () => {
-    Alert.alert(
-      'Confirmar exclusão',
-      'Tem certeza que deseja excluir este agendamento?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await StorageService.deleteAgendamento(agendamento.id);
-              Alert.alert('Sucesso', 'Agendamento excluído com sucesso!');
-              navigation.goBack();
-            } catch (error) {
-              Alert.alert('Erro', 'Não foi possível excluir o agendamento');
-            }
-          },
-        },
-      ]
-    );
+  const abrirWhatsApp = (telefone: string) => {
+    // Remove todos os caracteres não numéricos do telefone
+    const numeroLimpo = telefone.replace(/\D/g, '');
+    
+    // Adiciona o código do país se não tiver
+    const numeroCompleto = numeroLimpo.length <= 11 ? `55${numeroLimpo}` : numeroLimpo;
+    
+    // Cria o link do WhatsApp
+    const url = `https://wa.me/${numeroCompleto}`;
+    
+    // Abre o WhatsApp
+    Linking.openURL(url).catch(err => {
+      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp');
+    });
   };
 
   return (
@@ -48,7 +42,15 @@ export const AgendamentoDetalheScreen: React.FC<Props> = ({ navigation, route })
         <Text style={styles.value}>{agendamento.nomeCliente}</Text>
 
         <Text style={styles.label}>Telefone:</Text>
-        <Text style={styles.value}>{agendamento.telefone}</Text>
+        <View style={styles.telefoneContainer}>
+          <Text style={styles.value}>{agendamento.telefone}</Text>
+          <TouchableOpacity 
+            style={styles.whatsappButton}
+            onPress={() => abrirWhatsApp(agendamento.telefone)}
+          >
+            <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.label}>Data:</Text>
         <Text style={styles.value}>{new Date(agendamento.data).toLocaleDateString()}</Text>
@@ -65,13 +67,6 @@ export const AgendamentoDetalheScreen: React.FC<Props> = ({ navigation, route })
             <Text style={styles.value}>{agendamento.observacoes}</Text>
           </>
         )}
-
-        <TouchableOpacity 
-          style={styles.excluirButton}
-          onPress={handleExcluir}
-        >
-          <Text style={styles.excluirButtonText}>Excluir Agendamento</Text>
-        </TouchableOpacity>
       </Card>
     </View>
   );
@@ -85,6 +80,12 @@ const styles = StyleSheet.create({
   },
   card: {
     padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   label: {
     fontSize: 16,
@@ -98,16 +99,14 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 8,
   },
-  excluirButton: {
-    backgroundColor: '#ff4444',
-    padding: 16,
-    borderRadius: 8,
+  telefoneContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 24,
+    justifyContent: 'space-between',
   },
-  excluirButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  whatsappButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'rgba(37, 211, 102, 0.1)',
   },
 }); 
