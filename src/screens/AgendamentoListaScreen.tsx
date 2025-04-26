@@ -114,20 +114,27 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
     <Card style={styles.cardItem}>
       <View style={styles.cardContent}>
         <View style={styles.cardInfo}>
-          <Text style={styles.nome}>{item.nomeCliente}</Text>
+          <View style={styles.nomeContainer}>
+            <Ionicons name="person-circle-outline" size={20} color="#6200ee" />
+            <Text style={styles.nome}>{item.nomeCliente}</Text>
+          </View>
+          
           <View style={styles.infoRow}>
             <Ionicons name="call-outline" size={16} color="#666" style={styles.infoIcon} />
             <Text style={styles.telefone}>{item.telefone}</Text>
           </View>
+          
           <View style={styles.infoRow}>
             <Ionicons name="time-outline" size={16} color="#666" style={styles.infoIcon} />
             <Text style={styles.horario}>{item.hora}</Text>
           </View>
+          
           <View style={styles.infoRow}>
             <Ionicons name="cut-outline" size={16} color="#666" style={styles.infoIcon} />
             <Text style={styles.servico}>{item.servico}</Text>
           </View>
         </View>
+        
         <View style={styles.cardActions}>
           <TouchableOpacity 
             style={[styles.actionButton, styles.whatsappButton]}
@@ -135,12 +142,14 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
           >
             <Ionicons name="logo-whatsapp" size={18} color="#fff" />
           </TouchableOpacity>
+          
           <TouchableOpacity 
-            style={styles.actionButton}
+            style={[styles.actionButton, styles.detailsButton]}
             onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
           >
             <Ionicons name="eye-outline" size={18} color="#fff" />
           </TouchableOpacity>
+          
           <TouchableOpacity 
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleExcluirAgendamento(item.id)}
@@ -157,14 +166,16 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
       
       <View style={styles.header}>
-        <Text style={styles.title}>Agendamentos</Text>
-        <TouchableOpacity 
-          style={styles.novoButton}
-          onPress={() => navigation.navigate('Agendamentos')}
-        >
-          <Ionicons name="add-circle" size={20} color="#fff" style={styles.buttonIcon} />
-          <Text style={styles.novoButtonText}>Novo</Text>
-        </TouchableOpacity>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Agendamentos</Text>
+          <TouchableOpacity 
+            style={styles.novoButton}
+            onPress={() => navigation.navigate('Agendamentos')}
+          >
+            <Ionicons name="add-circle" size={20} color="#fff" style={styles.buttonIcon} />
+            <Text style={styles.novoButtonText}>Novo</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.dateSelector}>
@@ -176,11 +187,15 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.dateButtonText}>
             {dataSelecionada.toLocaleDateString()}
           </Text>
+          <Ionicons name="chevron-down" size={16} color="#6200ee" style={styles.dateIcon} />
         </TouchableOpacity>
         
-        <Text style={styles.agendamentosCount}>
-          {agendamentosFiltrados.length} {agendamentosFiltrados.length === 1 ? 'agendamento' : 'agendamentos'}
-        </Text>
+        <View style={styles.agendamentosCountContainer}>
+          <Ionicons name="calendar-number" size={16} color="#6200ee" />
+          <Text style={styles.agendamentosCount}>
+            {agendamentosFiltrados.length} {agendamentosFiltrados.length === 1 ? 'agendamento' : 'agendamentos'}
+          </Text>
+        </View>
       </View>
 
       <FlatList
@@ -188,7 +203,7 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Ionicons name="calendar-outline" size={60} color="#ccc" />
@@ -205,7 +220,16 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
-            <Text style={styles.calendarTitle}>Selecione a Data</Text>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Selecione a Data</Text>
+              <TouchableOpacity 
+                style={styles.closeIconButton}
+                onPress={() => setShowCalendar(false)}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
             <Calendar
               current={dataSelecionada.toISOString()}
               onDayPress={handleCalendarDayPress}
@@ -233,12 +257,6 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
                 textDayHeaderFontSize: 16
               }}
             />
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={() => setShowCalendar(false)}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -250,23 +268,29 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
         onRequestClose={cancelarExclusao}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
-            <Text style={styles.modalText}>
+          <View style={styles.deleteModalContainer}>
+            <View style={styles.deleteModalHeader}>
+              <Ionicons name="warning" size={32} color="#ff4444" />
+              <Text style={styles.deleteModalTitle}>Confirmar Exclusão</Text>
+            </View>
+            
+            <Text style={styles.deleteModalText}>
               Tem certeza que deseja excluir este agendamento?
             </Text>
-            <View style={styles.modalButtons}>
+            
+            <View style={styles.deleteModalButtons}>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]} 
+                style={[styles.deleteModalButton, styles.cancelButton]}
                 onPress={cancelarExclusao}
               >
-                <Text style={styles.modalButtonText}>Cancelar</Text>
+                <Text style={styles.cancelButtonText}>Cancelar</Text>
               </TouchableOpacity>
+              
               <TouchableOpacity 
-                style={[styles.modalButton, styles.deleteButton]} 
+                style={[styles.deleteModalButton, styles.confirmButton]}
                 onPress={confirmarExclusao}
               >
-                <Text style={styles.modalButtonText}>Excluir</Text>
+                <Text style={styles.confirmButtonText}>Excluir</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -282,31 +306,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
+    backgroundColor: '#6200ee',
+    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+    paddingBottom: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#6200ee',
-    paddingTop: Platform.OS === 'ios' ? 50 : 16,
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#ffffff',
   },
   novoButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: 10,
-    borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   buttonIcon: {
-    marginRight: 5,
+    marginRight: 4,
   },
   novoButtonText: {
     color: '#ffffff',
-    fontSize: 16,
     fontWeight: 'bold',
   },
   dateSelector: {
@@ -314,28 +346,38 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#e0e0e0',
   },
   dateButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   dateIcon: {
-    marginRight: 8,
+    marginRight: 4,
   },
   dateButtonText: {
-    fontSize: 16,
-    color: '#333',
+    color: '#6200ee',
     fontWeight: '500',
+    marginRight: 4,
+  },
+  agendamentosCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
   agendamentosCount: {
-    fontSize: 14,
-    color: '#666',
+    color: '#6200ee',
+    fontWeight: '500',
+    marginLeft: 4,
   },
   listContainer: {
     padding: 16,
@@ -343,7 +385,6 @@ const styles = StyleSheet.create({
   },
   cardItem: {
     marginBottom: 12,
-    padding: 16,
     borderRadius: 12,
     elevation: 2,
     shadowColor: '#000',
@@ -354,10 +395,20 @@ const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
   },
   cardInfo: {
     flex: 1,
+  },
+  nomeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  nome: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginLeft: 8,
   },
   infoRow: {
     flexDirection: 'row',
@@ -365,32 +416,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   infoIcon: {
-    marginRight: 6,
-  },
-  cardActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    backgroundColor: '#6200ee',
-    padding: 10,
-    borderRadius: 8,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  whatsappButton: {
-    backgroundColor: '#25D366',
-  },
-  deleteButton: {
-    backgroundColor: '#ff4444',
-  },
-  nome: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
+    marginRight: 8,
   },
   telefone: {
     fontSize: 14,
@@ -404,49 +430,79 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
   },
+  cardActions: {
+    justifyContent: 'space-around',
+    paddingLeft: 16,
+  },
+  actionButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  whatsappButton: {
+    backgroundColor: '#25D366',
+  },
+  detailsButton: {
+    backgroundColor: '#6200ee',
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+  },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    marginTop: 32,
   },
   emptyText: {
-    textAlign: 'center',
     fontSize: 16,
-    color: '#666666',
+    color: '#999999',
     marginTop: 16,
+    textAlign: 'center',
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   calendarContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   calendarTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#6200ee',
+    color: '#333333',
+  },
+  closeIconButton: {
+    padding: 4,
   },
   closeButton: {
     backgroundColor: '#6200ee',
-    padding: 12,
+    padding: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 16,
   },
   closeButtonText: {
     color: '#ffffff',
-    fontSize: 16,
     fontWeight: 'bold',
+    fontSize: 16,
   },
   modalOverlay: {
     flex: 1,
@@ -454,41 +510,56 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 20,
+  deleteModalContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 24,
     width: '80%',
-    maxWidth: 400,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: 10,
-  },
-  modalButton: {
-    padding: 12,
-    borderRadius: 6,
-    minWidth: 100,
+  deleteModalHeader: {
     alignItems: 'center',
+    marginBottom: 16,
+  },
+  deleteModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginTop: 8,
+  },
+  deleteModalText: {
+    fontSize: 16,
+    color: '#666666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  deleteModalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  deleteModalButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 8,
   },
   cancelButton: {
-    backgroundColor: '#666666',
+    backgroundColor: '#f5f5f5',
   },
-  modalButtonText: {
-    color: 'white',
-    fontSize: 16,
+  confirmButton: {
+    backgroundColor: '#ff4444',
+  },
+  cancelButtonText: {
+    color: '#666666',
+    fontWeight: 'bold',
+  },
+  confirmButtonText: {
+    color: '#ffffff',
     fontWeight: 'bold',
   },
 }); 

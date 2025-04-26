@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, Modal, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, Modal, Platform, ScrollView, StatusBar } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Agendamento } from '../types';
@@ -8,6 +8,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar } from 'react-native-calendars';
+import { Ionicons } from '@expo/vector-icons';
 
 type AgendamentoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Agendamentos'>;
 
@@ -203,102 +204,87 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Novo Agendamento</Text>
+      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
       
-      <Card style={styles.formCard}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome do Cliente"
-          value={nomeCliente}
-          onChangeText={setNomeCliente}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Telefone (WhatsApp)"
-          value={telefone}
-          onChangeText={handleTelefoneChange}
-          keyboardType="numeric"
-          maxLength={15}
-        />
-
+      <View style={styles.header}>
         <TouchableOpacity 
-          style={styles.dateButton}
-          onPress={() => setShowCalendar(true)}
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.dateButtonText}>
-            Data: {data.toLocaleDateString()}
-          </Text>
+          <Ionicons name="arrow-back" size={24} color="#ffffff" />
         </TouchableOpacity>
+        <Text style={styles.title}>Novo Agendamento</Text>
+        <View style={styles.placeholder} />
+      </View>
+      
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <Card style={styles.formCard}>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="#666666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Nome do Cliente"
+              value={nomeCliente}
+              onChangeText={setNomeCliente}
+              placeholderTextColor="#999999"
+            />
+          </View>
 
-        <TouchableOpacity 
-          style={styles.dateButton}
-          onPress={() => setShowTimeList(true)}
-        >
-          <Text style={styles.dateButtonText}>
-            Hora: {hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-        </TouchableOpacity>
+          <View style={styles.inputContainer}>
+            <Ionicons name="call-outline" size={20} color="#666666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Telefone (WhatsApp)"
+              value={telefone}
+              onChangeText={handleTelefoneChange}
+              keyboardType="numeric"
+              maxLength={15}
+              placeholderTextColor="#999999"
+            />
+          </View>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Serviço"
-          value={servico}
-          onChangeText={setServico}
-        />
+          <View style={styles.dateTimeContainer}>
+            <TouchableOpacity 
+              style={styles.dateTimeButton}
+              onPress={() => setShowCalendar(true)}
+            >
+              <Ionicons name="calendar-outline" size={20} color="#6200ee" style={styles.dateTimeIcon} />
+              <Text style={styles.dateTimeButtonText}>
+                {data.toLocaleDateString()}
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity 
-          style={styles.saveButton}
-          onPress={handleSalvar}
-        >
-          <Text style={styles.saveButtonText}>Salvar Agendamento</Text>
-        </TouchableOpacity>
-      </Card>
+            <TouchableOpacity 
+              style={styles.dateTimeButton}
+              onPress={() => setShowTimeList(true)}
+            >
+              <Ionicons name="time-outline" size={20} color="#6200ee" style={styles.dateTimeIcon} />
+              <Text style={styles.dateTimeButtonText}>
+                {hora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-      <Text style={styles.subtitle}>Agendamentos</Text>
-      <FlatList
-        data={agendamentos}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={true}
-      />
+          <View style={styles.inputContainer}>
+            <Ionicons name="cut-outline" size={20} color="#666666" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Serviço"
+              value={servico}
+              onChangeText={setServico}
+              placeholderTextColor="#999999"
+            />
+          </View>
 
-      {Platform.OS === 'ios' && showDatePicker && (
-        <DateTimePicker
-          value={data}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-        />
-      )}
-
-      {Platform.OS === 'ios' && showTimePicker && (
-        <DateTimePicker
-          value={hora}
-          mode="time"
-          display="default"
-          onChange={handleTimeChange}
-        />
-      )}
-
-      {Platform.OS === 'android' && showDatePicker && (
-        <DateTimePicker
-          value={data}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-        />
-      )}
-
-      {Platform.OS === 'android' && showTimePicker && (
-        <DateTimePicker
-          value={hora}
-          mode="time"
-          display="default"
-          onChange={handleTimeChange}
-        />
-      )}
+          <TouchableOpacity 
+            style={styles.saveButton}
+            onPress={handleSalvar}
+          >
+            <Ionicons name="save-outline" size={20} color="#ffffff" style={styles.saveIcon} />
+            <Text style={styles.saveButtonText}>Salvar Agendamento</Text>
+          </TouchableOpacity>
+        </Card>
+      </ScrollView>
 
       <Modal
         visible={showCalendar}
@@ -308,7 +294,16 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.calendarContainer}>
-            <Text style={styles.calendarTitle}>Selecione a Data</Text>
+            <View style={styles.calendarHeader}>
+              <Text style={styles.calendarTitle}>Selecione a Data</Text>
+              <TouchableOpacity 
+                style={styles.closeIconButton}
+                onPress={() => setShowCalendar(false)}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
             <Calendar
               current={data.toISOString()}
               onDayPress={handleCalendarDayPress}
@@ -336,12 +331,6 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
                 textDayHeaderFontSize: 16
               }}
             />
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={() => setShowCalendar(false)}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -354,26 +343,48 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
       >
         <View style={styles.modalContainer}>
           <View style={styles.timeListContainer}>
-            <Text style={styles.timeListTitle}>Selecione o Horário</Text>
-            <Text style={styles.timeListSubtitle}>
-              Horários disponíveis para {data.toLocaleDateString()}
-            </Text>
+            <View style={styles.timeListHeader}>
+              <Text style={styles.timeListTitle}>Selecione o Horário</Text>
+              <TouchableOpacity 
+                style={styles.closeIconButton}
+                onPress={() => setShowTimeList(false)}
+              >
+                <Ionicons name="close" size={24} color="#666" />
+              </TouchableOpacity>
+            </View>
+            
             <FlatList
               data={HORARIOS_DISPONIVEIS}
               renderItem={renderTimeItem}
               keyExtractor={item => item}
-              numColumns={2}
+              numColumns={3}
               contentContainerStyle={styles.timeListContent}
+              showsVerticalScrollIndicator={false}
             />
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={() => setShowTimeList(false)}
-            >
-              <Text style={styles.closeButtonText}>Fechar</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </Modal>
+
+      {Platform.OS === 'ios' && (
+        <>
+          {showDatePicker && (
+            <DateTimePicker
+              value={data}
+              mode="date"
+              display="spinner"
+              onChange={handleDateChange}
+            />
+          )}
+          {showTimePicker && (
+            <DateTimePicker
+              value={hora}
+              mode="time"
+              display="spinner"
+              onChange={handleTimeChange}
+            />
+          )}
+        </>
+      )}
     </View>
   );
 };
@@ -382,55 +393,183 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
+  },
+  header: {
+    backgroundColor: '#6200ee',
+    paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
+    paddingBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  backButton: {
+    padding: 8,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  subtitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 24,
-    marginBottom: 16,
+    color: '#ffffff',
+  },
+  placeholder: {
+    width: 40,
+  },
+  content: {
+    flex: 1,
+    padding: 16,
   },
   formCard: {
     padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
     marginBottom: 16,
+    paddingHorizontal: 12,
+    height: 50,
+  },
+  inputIcon: {
+    marginRight: 12,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
+    flex: 1,
+    height: 50,
     fontSize: 16,
+    color: '#333333',
   },
-  dateButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  dateButtonText: {
+  dateTimeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    flex: 1,
+    marginHorizontal: 4,
+  },
+  dateTimeIcon: {
+    marginRight: 8,
+  },
+  dateTimeButtonText: {
+    color: '#6200ee',
     fontSize: 16,
-    color: '#333',
+    fontWeight: '500',
   },
   saveButton: {
     backgroundColor: '#6200ee',
-    padding: 16,
     borderRadius: 8,
+    padding: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  saveIcon: {
+    marginRight: 8,
   },
   saveButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  listContainer: {
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  calendarContainer: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+  },
+  calendarHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  calendarTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  closeIconButton: {
+    padding: 4,
+  },
+  timeListContainer: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
+    maxHeight: '80%',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+  },
+  timeListHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  timeListTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  timeListContent: {
     paddingBottom: 16,
+  },
+  timeItem: {
+    flex: 1,
+    margin: 4,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    alignItems: 'center',
+  },
+  timeItemOcupado: {
+    backgroundColor: '#f0f0f0',
+  },
+  timeItemSelecionado: {
+    backgroundColor: '#6200ee',
+  },
+  timeItemText: {
+    color: '#6200ee',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  timeItemTextOcupado: {
+    color: '#999999',
+  },
+  timeItemTextSelecionado: {
+    color: '#ffffff',
   },
   cardItem: {
     marginBottom: 12,
@@ -459,86 +598,5 @@ const styles = StyleSheet.create({
   servico: {
     fontSize: 14,
     color: '#666666',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  calendarContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
-  },
-  calendarTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-    color: '#6200ee',
-  },
-  closeButton: {
-    backgroundColor: '#6200ee',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  closeButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  timeListContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '90%',
-    maxWidth: 400,
-    maxHeight: '80%',
-  },
-  timeListTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 5,
-    color: '#6200ee',
-  },
-  timeListSubtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    marginBottom: 15,
-    color: '#666666',
-  },
-  timeListContent: {
-    paddingVertical: 10,
-  },
-  timeItem: {
-    flex: 1,
-    margin: 5,
-    padding: 15,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  timeItemOcupado: {
-    backgroundColor: '#ffebee',
-  },
-  timeItemSelecionado: {
-    backgroundColor: '#6200ee',
-  },
-  timeItemText: {
-    fontSize: 16,
-    color: '#333333',
-  },
-  timeItemTextOcupado: {
-    color: '#999999',
-    textDecorationLine: 'line-through',
-  },
-  timeItemTextSelecionado: {
-    color: '#ffffff',
   },
 }); 
