@@ -22,6 +22,8 @@ export const PontoHistoricoScreen: React.FC = () => {
   const [pontoEmEdicao, setPontoEmEdicao] = useState<Ponto | null>(null);
   const [mostrarSeletorHora, setMostrarSeletorHora] = useState<boolean>(false);
   const [tipoHoraSelecionada, setTipoHoraSelecionada] = useState<'entrada' | 'saida' | 'entradaAlmoco' | 'saidaAlmoco' | null>(null);
+  const [modalExclusaoVisible, setModalExclusaoVisible] = useState<boolean>(false);
+  const [pontoParaExcluir, setPontoParaExcluir] = useState<Ponto | null>(null);
 
   const calcularHorasTrabalhadas = (ponto: Ponto): number => {
     if (!ponto.entrada || !ponto.saida) return 0;
@@ -172,6 +174,30 @@ export const PontoHistoricoScreen: React.FC = () => {
     }
   };
 
+  const mostrarModalExclusao = (ponto: Ponto) => {
+    setPontoParaExcluir(ponto);
+    setModalExclusaoVisible(true);
+  };
+
+  const confirmarExclusao = async () => {
+    if (!pontoParaExcluir) return;
+
+    try {
+      await StorageService.deletePonto(pontoParaExcluir.data);
+      await carregarPontos();
+      setModalExclusaoVisible(false);
+      setPontoParaExcluir(null);
+      Alert.alert('Sucesso', 'Registro excluído com sucesso!');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível excluir o registro.');
+    }
+  };
+
+  const cancelarExclusao = () => {
+    setModalExclusaoVisible(false);
+    setPontoParaExcluir(null);
+  };
+
   const renderItem = ({ item }: { item: Ponto }) => (
     <Card style={styles.cardItem}>
       <View style={styles.cardHeader}>
@@ -184,7 +210,7 @@ export const PontoHistoricoScreen: React.FC = () => {
             <Ionicons name="create-outline" size={20} color="#ffffff" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={() => excluirPonto(item.data)}
+            onPress={() => mostrarModalExclusao(item)}
             style={[styles.actionButton, styles.deleteButton]}
           >
             <Ionicons name="trash-outline" size={20} color="#ffffff" />
@@ -329,6 +355,42 @@ export const PontoHistoricoScreen: React.FC = () => {
                 onPress={salvarEdicao}
               >
                 <Text style={styles.modalButtonText}>Salvar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={modalExclusaoVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={cancelarExclusao}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Ionicons name="warning" size={32} color="#ff4444" />
+              <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
+            </View>
+            
+            <Text style={styles.modalText}>
+              Tem certeza que deseja excluir este registro de ponto?
+            </Text>
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.modalCancelButton]}
+                onPress={cancelarExclusao}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.modalDeleteButton]}
+                onPress={confirmarExclusao}
+              >
+                <Text style={styles.modalButtonText}>Excluir</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -511,5 +573,24 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  modalDeleteButton: {
+    backgroundColor: '#4A90E2',
+  },
+  modalCancelButton: {
+    backgroundColor: '#f44336',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 24,
+    textAlign: 'center',
   },
 }); 
