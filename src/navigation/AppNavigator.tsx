@@ -5,18 +5,20 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { HomeScreen } from '../screens/HomeScreen';
 import { AgendamentoScreen } from '../screens/AgendamentoScreen';
+import { AgendamentoDetalheScreen } from '../screens/AgendamentoDetalheScreen';
+import { AgendamentoListaScreen } from '../screens/AgendamentoListaScreen';
 import { PontoScreen } from '../screens/PontoScreen';
 import { PontoHistoricoScreen } from '../screens/PontoHistoricoScreen';
-import { AgendamentoDetalheScreen } from '../screens/AgendamentoDetalheScreen';
 import { Agendamento } from '../types';
 
 // Definição dos tipos para navegação
 export type RootStackParamList = {
   Home: undefined;
   Agendamentos: undefined;
+  AgendamentoDetalhe: { agendamento: Agendamento };
+  AgendamentoLista: undefined;
   PontoStack: { screen: string };
   Ponto: undefined;
-  AgendamentoDetalhe: { agendamento: Agendamento };
   HistoricoPonto: undefined;
 };
 
@@ -26,9 +28,14 @@ const Stack = createStackNavigator<RootStackParamList>();
 const AgendamentoStack = () => (
   <Stack.Navigator>
     <Stack.Screen 
+      name="AgendamentoLista" 
+      component={AgendamentoListaScreen}
+      options={{ title: 'Agendamentos' }}
+    />
+    <Stack.Screen 
       name="Agendamentos" 
       component={AgendamentoScreen}
-      options={{ title: 'Agendamentos' }}
+      options={{ title: 'Novo Agendamento' }}
     />
     <Stack.Screen 
       name="AgendamentoDetalhe" 

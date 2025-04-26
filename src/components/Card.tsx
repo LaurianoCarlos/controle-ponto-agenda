@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, ViewStyle, StyleSheet } from 'react-native';
 
 interface CardProps {
   children: React.ReactNode;
@@ -21,13 +21,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    elevation: 3,
   },
 }); 
