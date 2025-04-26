@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform, Linking } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Agendamento } from '../types';
@@ -93,6 +93,22 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
     setAgendamentoParaExcluir(null);
   };
 
+  const abrirWhatsApp = (telefone: string) => {
+    // Remove todos os caracteres não numéricos do telefone
+    const numeroLimpo = telefone.replace(/\D/g, '');
+    
+    // Adiciona o código do país se não tiver
+    const numeroCompleto = numeroLimpo.length <= 11 ? `55${numeroLimpo}` : numeroLimpo;
+    
+    // Cria o link do WhatsApp
+    const url = `https://wa.me/${numeroCompleto}`;
+    
+    // Abre o WhatsApp
+    Linking.openURL(url).catch(err => {
+      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp');
+    });
+  };
+
   const renderItem = ({ item }: { item: Agendamento }) => (
     <Card style={styles.cardItem}>
       <View style={styles.cardContent}>
@@ -103,6 +119,12 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.servico}>{item.servico}</Text>
         </View>
         <View style={styles.cardActions}>
+          <TouchableOpacity 
+            style={[styles.actionButton, styles.whatsappButton]}
+            onPress={() => abrirWhatsApp(item.telefone)}
+          >
+            <Text style={styles.actionButtonText}>WhatsApp</Text>
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
@@ -404,5 +426,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  whatsappButton: {
+    backgroundColor: '#25D366',
   },
 }); 
