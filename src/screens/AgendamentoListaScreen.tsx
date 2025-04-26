@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform, Linking } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform, Linking, StatusBar } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Agendamento } from '../types';
@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { Calendar } from 'react-native-calendars';
+import { Ionicons } from '@expo/vector-icons';
 
 type AgendamentoListaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AgendamentoLista'>;
 
@@ -114,28 +115,37 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.cardContent}>
         <View style={styles.cardInfo}>
           <Text style={styles.nome}>{item.nomeCliente}</Text>
-          <Text style={styles.telefone}>{item.telefone}</Text>
-          <Text style={styles.horario}>{item.hora}</Text>
-          <Text style={styles.servico}>{item.servico}</Text>
+          <View style={styles.infoRow}>
+            <Ionicons name="call-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Text style={styles.telefone}>{item.telefone}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="time-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Text style={styles.horario}>{item.hora}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Ionicons name="cut-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Text style={styles.servico}>{item.servico}</Text>
+          </View>
         </View>
         <View style={styles.cardActions}>
           <TouchableOpacity 
             style={[styles.actionButton, styles.whatsappButton]}
             onPress={() => abrirWhatsApp(item.telefone)}
           >
-            <Text style={styles.actionButtonText}>WhatsApp</Text>
+            <Ionicons name="logo-whatsapp" size={18} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
           >
-            <Text style={styles.actionButtonText}>Detalhes</Text>
+            <Ionicons name="eye-outline" size={18} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleExcluirAgendamento(item.id)}
           >
-            <Text style={styles.actionButtonText}>Excluir</Text>
+            <Ionicons name="trash-outline" size={18} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
@@ -144,24 +154,34 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
+      
       <View style={styles.header}>
         <Text style={styles.title}>Agendamentos</Text>
         <TouchableOpacity 
           style={styles.novoButton}
           onPress={() => navigation.navigate('Agendamentos')}
         >
-          <Text style={styles.novoButtonText}>Novo Agendamento</Text>
+          <Ionicons name="add-circle" size={20} color="#fff" style={styles.buttonIcon} />
+          <Text style={styles.novoButtonText}>Novo</Text>
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity 
-        style={styles.dateButton}
-        onPress={() => setShowCalendar(true)}
-      >
-        <Text style={styles.dateButtonText}>
-          {dataSelecionada.toLocaleDateString()}
+      <View style={styles.dateSelector}>
+        <TouchableOpacity 
+          style={styles.dateButton}
+          onPress={() => setShowCalendar(true)}
+        >
+          <Ionicons name="calendar" size={20} color="#6200ee" style={styles.dateIcon} />
+          <Text style={styles.dateButtonText}>
+            {dataSelecionada.toLocaleDateString()}
+          </Text>
+        </TouchableOpacity>
+        
+        <Text style={styles.agendamentosCount}>
+          {agendamentosFiltrados.length} {agendamentosFiltrados.length === 1 ? 'agendamento' : 'agendamentos'}
         </Text>
-      </TouchableOpacity>
+      </View>
 
       <FlatList
         data={agendamentosFiltrados}
@@ -170,7 +190,10 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={true}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Nenhum agendamento para esta data</Text>
+          <View style={styles.emptyContainer}>
+            <Ionicons name="calendar-outline" size={60} color="#ccc" />
+            <Text style={styles.emptyText}>Nenhum agendamento para esta data</Text>
+          </View>
         }
       />
 
@@ -257,53 +280,92 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-    padding: 16,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#6200ee',
+    paddingTop: Platform.OS === 'ios' ? 50 : 16,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#fff',
   },
   novoButton: {
-    backgroundColor: '#6200ee',
-    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    padding: 10,
     borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonIcon: {
+    marginRight: 5,
   },
   novoButtonText: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  dateSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
   dateButton: {
     backgroundColor: '#f0f0f0',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 16,
+    flexDirection: 'row',
     alignItems: 'center',
+  },
+  dateIcon: {
+    marginRight: 8,
   },
   dateButtonText: {
     fontSize: 16,
     color: '#333',
+    fontWeight: '500',
+  },
+  agendamentosCount: {
+    fontSize: 14,
+    color: '#666',
   },
   listContainer: {
-    paddingBottom: 16,
+    padding: 16,
+    paddingBottom: 32,
   },
   cardItem: {
     marginBottom: 12,
     padding: 16,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   cardContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   cardInfo: {
     flex: 1,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  infoIcon: {
+    marginRight: 6,
   },
   cardActions: {
     flexDirection: 'row',
@@ -311,43 +373,48 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     backgroundColor: '#6200ee',
-    padding: 8,
-    borderRadius: 4,
-    minWidth: 80,
+    padding: 10,
+    borderRadius: 8,
+    width: 40,
+    height: 40,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  whatsappButton: {
+    backgroundColor: '#25D366',
   },
   deleteButton: {
     backgroundColor: '#ff4444',
   },
-  actionButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   nome: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: 8,
+    color: '#333',
   },
   telefone: {
     fontSize: 14,
     color: '#666666',
-    marginBottom: 4,
   },
   horario: {
     fontSize: 14,
     color: '#666666',
-    marginBottom: 2,
   },
   servico: {
     fontSize: 14,
     color: '#666666',
   },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
+    marginTop: 32,
+  },
   emptyText: {
     textAlign: 'center',
     fontSize: 16,
     color: '#666666',
-    marginTop: 32,
+    marginTop: 16,
   },
   modalContainer: {
     flex: 1,
@@ -419,15 +486,9 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#666666',
   },
-  deleteButton: {
-    backgroundColor: '#ff4444',
-  },
   modalButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  whatsappButton: {
-    backgroundColor: '#25D366',
   },
 }); 
