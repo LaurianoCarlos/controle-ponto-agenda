@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ScrollView, Alert, TouchableOpacity, Modal, Platform } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Ponto } from '../types';
 import { useFocusEffect } from '@react-navigation/native';
 import { Calendar } from 'react-native-calendars';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ResumoHoras {
   totalHoras: number;
@@ -16,6 +18,10 @@ export const PontoHistoricoScreen: React.FC = () => {
   const [mesSelecionado, setMesSelecionado] = useState<number>(new Date().getMonth());
   const [diasMarcados, setDiasMarcados] = useState<{[key: string]: {selected: boolean, marked: boolean, dotColor: string}}>({});
   const [resumoHoras, setResumoHoras] = useState<ResumoHoras>({ totalHoras: 0, horasExtras: 0 });
+  const [modalEdicaoVisible, setModalEdicaoVisible] = useState<boolean>(false);
+  const [pontoEmEdicao, setPontoEmEdicao] = useState<Ponto | null>(null);
+  const [mostrarSeletorHora, setMostrarSeletorHora] = useState<boolean>(false);
+  const [tipoHoraSelecionada, setTipoHoraSelecionada] = useState<'entrada' | 'saida' | 'entradaAlmoco' | 'saidaAlmoco' | null>(null);
 
   const calcularHorasTrabalhadas = (ponto: Ponto): number => {
     if (!ponto.entrada || !ponto.saida) return 0;
@@ -118,16 +124,72 @@ export const PontoHistoricoScreen: React.FC = () => {
     );
   };
 
+  const abrirModalEdicao = (ponto: Ponto) => {
+    setPontoEmEdicao({
+      ...ponto,
+      entrada: new Date(ponto.entrada),
+      saida: ponto.saida ? new Date(ponto.saida) : undefined,
+      entradaAlmoco: ponto.entradaAlmoco ? new Date(ponto.entradaAlmoco) : undefined,
+      saidaAlmoco: ponto.saidaAlmoco ? new Date(ponto.saidaAlmoco) : undefined,
+    });
+    setModalEdicaoVisible(true);
+  };
+
+  const fecharModalEdicao = () => {
+    setModalEdicaoVisible(false);
+    setPontoEmEdicao(null);
+  };
+
+  const selecionarHora = (tipo: 'entrada' | 'saida' | 'entradaAlmoco' | 'saidaAlmoco') => {
+    setTipoHoraSelecionada(tipo);
+    setMostrarSeletorHora(true);
+  };
+
+  const onHoraChange = (event: any, horaSelecionada?: Date) => {
+    setMostrarSeletorHora(false);
+    if (horaSelecionada && pontoEmEdicao && tipoHoraSelecionada) {
+      const novaData = new Date(pontoEmEdicao[tipoHoraSelecionada] || new Date());
+      novaData.setHours(horaSelecionada.getHours());
+      novaData.setMinutes(horaSelecionada.getMinutes());
+      
+      setPontoEmEdicao({
+        ...pontoEmEdicao,
+        [tipoHoraSelecionada]: novaData,
+      });
+    }
+  };
+
+  const salvarEdicao = async () => {
+    if (!pontoEmEdicao) return;
+
+    try {
+      await StorageService.savePonto(pontoEmEdicao);
+      await carregarPontos();
+      fecharModalEdicao();
+      Alert.alert('Sucesso', 'Registro atualizado com sucesso!');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível atualizar o registro.');
+    }
+  };
+
   const renderItem = ({ item }: { item: Ponto }) => (
     <Card style={styles.cardItem}>
       <View style={styles.cardHeader}>
         <Text style={styles.data}>{formatarData(item.data)}</Text>
-        <TouchableOpacity
-          onPress={() => excluirPonto(item.data)}
-          style={styles.deleteButton}
-        >
-          <Text style={styles.deleteButtonText}>Excluir</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => abrirModalEdicao(item)}
+            style={[styles.actionButton, styles.editButton]}
+          >
+            <Ionicons name="create-outline" size={20} color="#ffffff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => excluirPonto(item.data)}
+            style={[styles.actionButton, styles.deleteButton]}
+          >
+            <Ionicons name="trash-outline" size={20} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.horariosContainer}>
         <Text style={styles.horario}>Entrada: {formatarHora(item.entrada)}</Text>
@@ -195,6 +257,93 @@ export const PontoHistoricoScreen: React.FC = () => {
         contentContainerStyle={styles.listContainer}
         showsVerticalScrollIndicator={true}
       />
+
+      <Modal
+        visible={modalEdicaoVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={fecharModalEdicao}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Registro</Text>
+            <Text style={styles.modalSubtitle}>{pontoEmEdicao ? formatarData(pontoEmEdicao.data) : ''}</Text>
+
+            <View style={styles.horaEditContainer}>
+              <Text style={styles.horaLabel}>Entrada:</Text>
+              <TouchableOpacity
+                style={styles.horaButton}
+                onPress={() => selecionarHora('entrada')}
+              >
+                <Text style={styles.horaText}>
+                  {pontoEmEdicao?.entrada ? formatarHora(pontoEmEdicao.entrada) : '--:--'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.horaEditContainer}>
+              <Text style={styles.horaLabel}>Saída Almoço:</Text>
+              <TouchableOpacity
+                style={styles.horaButton}
+                onPress={() => selecionarHora('entradaAlmoco')}
+              >
+                <Text style={styles.horaText}>
+                  {pontoEmEdicao?.entradaAlmoco ? formatarHora(pontoEmEdicao.entradaAlmoco) : '--:--'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.horaEditContainer}>
+              <Text style={styles.horaLabel}>Volta Almoço:</Text>
+              <TouchableOpacity
+                style={styles.horaButton}
+                onPress={() => selecionarHora('saidaAlmoco')}
+              >
+                <Text style={styles.horaText}>
+                  {pontoEmEdicao?.saidaAlmoco ? formatarHora(pontoEmEdicao.saidaAlmoco) : '--:--'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.horaEditContainer}>
+              <Text style={styles.horaLabel}>Saída:</Text>
+              <TouchableOpacity
+                style={styles.horaButton}
+                onPress={() => selecionarHora('saida')}
+              >
+                <Text style={styles.horaText}>
+                  {pontoEmEdicao?.saida ? formatarHora(pontoEmEdicao.saida) : '--:--'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={fecharModalEdicao}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.saveButton]}
+                onPress={salvarEdicao}
+              >
+                <Text style={styles.modalButtonText}>Salvar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {mostrarSeletorHora && (
+        <DateTimePicker
+          value={pontoEmEdicao?.[tipoHoraSelecionada || 'entrada'] || new Date()}
+          mode="time"
+          is24Hour={true}
+          display="default"
+          onChange={onHoraChange}
+        />
+      )}
     </View>
   );
 };
@@ -239,16 +388,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    padding: 8,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  editButton: {
+    backgroundColor: '#4CAF50',
+  },
   deleteButton: {
     backgroundColor: '#f44336',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 4,
-  },
-  deleteButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: 'bold',
   },
   horariosContainer: {
     gap: 4,
@@ -286,5 +441,75 @@ const styles = StyleSheet.create({
   },
   horasExtras: {
     color: '#f44336',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 24,
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  horaEditContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  horaLabel: {
+    fontSize: 16,
+    color: '#333333',
+    flex: 1,
+  },
+  horaButton: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 4,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  horaText: {
+    fontSize: 16,
+    color: '#333333',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+    marginTop: 24,
+  },
+  modalButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f44336',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
 }); 

@@ -87,6 +87,22 @@ export const StorageService = {
     }
   },
 
+  deletePonto: async (data: string): Promise<void> => {
+    try {
+      const pontos = await StorageService.getPontos();
+      const pontosFiltrados = pontos.filter(p => p.data !== data);
+      
+      if (pontos.length === pontosFiltrados.length) {
+        throw new Error('Ponto não encontrado');
+      }
+      
+      await AsyncStorage.setItem(STORAGE_KEYS.PONTOS, JSON.stringify(pontosFiltrados));
+    } catch (error) {
+      console.error('Erro ao excluir ponto:', error);
+      throw error;
+    }
+  },
+
   clearAllData: async (): Promise<void> => {
     try {
       await AsyncStorage.multiRemove([
