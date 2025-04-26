@@ -104,9 +104,37 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
     setShowTimeList(false);
   };
 
+  const formatarTelefone = (text: string) => {
+    // Remove tudo que não for número
+    const numeros = text.replace(/\D/g, '');
+    
+    // Aplica a máscara do WhatsApp
+    if (numeros.length <= 2) {
+      return `(${numeros}`;
+    } else if (numeros.length <= 7) {
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2)}`;
+    } else if (numeros.length <= 11) {
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7)}`;
+    } else {
+      return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7, 11)}`;
+    }
+  };
+
+  const handleTelefoneChange = (text: string) => {
+    const telefoneFormatado = formatarTelefone(text);
+    setTelefone(telefoneFormatado);
+  };
+
   const handleSalvar = async () => {
     if (!nomeCliente.trim() || !telefone.trim() || !servico.trim()) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos obrigatórios');
+      return;
+    }
+
+    // Verifica se o telefone está no formato correto
+    const telefoneNumeros = telefone.replace(/\D/g, '');
+    if (telefoneNumeros.length < 10 || telefoneNumeros.length > 11) {
+      Alert.alert('Erro', 'Por favor, insira um número de telefone válido');
       return;
     }
 
@@ -187,10 +215,11 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
 
         <TextInput
           style={styles.input}
-          placeholder="Telefone"
+          placeholder="Telefone (WhatsApp)"
           value={telefone}
-          onChangeText={setTelefone}
-          keyboardType="phone-pad"
+          onChangeText={handleTelefoneChange}
+          keyboardType="numeric"
+          maxLength={15}
         />
 
         <TouchableOpacity 
