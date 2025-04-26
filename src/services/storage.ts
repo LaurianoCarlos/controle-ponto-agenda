@@ -1,51 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Cliente, Agendamento, Ponto } from '../types';
+import { Agendamento, Ponto } from '../types';
 
 const STORAGE_KEYS = {
-  CLIENTES: '@app_cachos:clientes',
   AGENDAMENTOS: '@app_cachos:agendamentos',
   PONTOS: '@app_cachos:pontos',
 };
 
 export const StorageService = {
-  // Clientes
-  getClientes: async (): Promise<Cliente[]> => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEYS.CLIENTES);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Erro ao carregar clientes:', error);
-      return [];
-    }
-  },
-
-  saveCliente: async (cliente: Cliente): Promise<void> => {
-    try {
-      const clientes = await StorageService.getClientes();
-      const index = clientes.findIndex(c => c.id === cliente.id);
-      
-      if (index >= 0) {
-        clientes[index] = cliente;
-      } else {
-        clientes.push(cliente);
-      }
-      
-      await AsyncStorage.setItem(STORAGE_KEYS.CLIENTES, JSON.stringify(clientes));
-    } catch (error) {
-      console.error('Erro ao salvar cliente:', error);
-      throw error;
-    }
-  },
-
-  saveClientes: async (clientes: Cliente[]): Promise<void> => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEYS.CLIENTES, JSON.stringify(clientes));
-    } catch (error) {
-      console.error('Erro ao salvar lista de clientes:', error);
-      throw error;
-    }
-  },
-
   // Agendamentos
   getAgendamentos: async (): Promise<Agendamento[]> => {
     try {
@@ -71,6 +32,17 @@ export const StorageService = {
       await AsyncStorage.setItem(STORAGE_KEYS.AGENDAMENTOS, JSON.stringify(agendamentos));
     } catch (error) {
       console.error('Erro ao salvar agendamento:', error);
+      throw error;
+    }
+  },
+
+  deleteAgendamento: async (id: string): Promise<void> => {
+    try {
+      const agendamentos = await StorageService.getAgendamentos();
+      const agendamentosFiltrados = agendamentos.filter(a => a.id !== id);
+      await AsyncStorage.setItem(STORAGE_KEYS.AGENDAMENTOS, JSON.stringify(agendamentosFiltrados));
+    } catch (error) {
+      console.error('Erro ao excluir agendamento:', error);
       throw error;
     }
   },
@@ -104,21 +76,9 @@ export const StorageService = {
     }
   },
 
-  deletePonto: async (data: string): Promise<void> => {
-    try {
-      const pontos = await StorageService.getPontos();
-      const pontosAtualizados = pontos.filter(p => p.data !== data);
-      await AsyncStorage.setItem(STORAGE_KEYS.PONTOS, JSON.stringify(pontosAtualizados));
-    } catch (error) {
-      console.error('Erro ao excluir ponto:', error);
-      throw error;
-    }
-  },
-
   clearAllData: async (): Promise<void> => {
     try {
       await AsyncStorage.multiRemove([
-        STORAGE_KEYS.CLIENTES,
         STORAGE_KEYS.AGENDAMENTOS,
         STORAGE_KEYS.PONTOS,
       ]);

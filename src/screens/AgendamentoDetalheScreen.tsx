@@ -1,63 +1,79 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Card } from '../components/Card';
-import { Agendamento, Cliente } from '../types';
-import { RouteProp } from '@react-navigation/native';
+import { StorageService } from '../services/storage';
+import { Agendamento } from '../types';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
+import { RouteProp } from '@react-navigation/native';
 
-type AgendamentoDetalheScreenRouteProp = RouteProp<RootStackParamList, 'AgendamentoDetalhe'>;
 type AgendamentoDetalheScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AgendamentoDetalhe'>;
+type AgendamentoDetalheScreenRouteProp = RouteProp<RootStackParamList, 'AgendamentoDetalhe'>;
 
 interface Props {
-  route: AgendamentoDetalheScreenRouteProp;
   navigation: AgendamentoDetalheScreenNavigationProp;
+  route: AgendamentoDetalheScreenRouteProp;
 }
 
-export const AgendamentoDetalheScreen: React.FC<Props> = ({ route }) => {
-  const { agendamento, cliente } = route.params;
+export const AgendamentoDetalheScreen: React.FC<Props> = ({ navigation, route }) => {
+  const { agendamento } = route.params;
 
-  const formatarData = (data: string, hora: string) => {
-    const [ano, mes, dia] = data.split('-').map(Number);
-    return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR') + ' às ' + hora;
+  const handleExcluir = async () => {
+    Alert.alert(
+      'Confirmar exclusão',
+      'Tem certeza que deseja excluir este agendamento?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await StorageService.deleteAgendamento(agendamento.id);
+              Alert.alert('Sucesso', 'Agendamento excluído com sucesso!');
+              navigation.goBack();
+            } catch (error) {
+              Alert.alert('Erro', 'Não foi possível excluir o agendamento');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Card style={styles.card}>
-        <Text style={styles.title}>Detalhes do Agendamento</Text>
-        
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Cliente:</Text>
-          <Text style={styles.value}>{cliente.nome}</Text>
-        </View>
+        <Text style={styles.label}>Nome do Cliente:</Text>
+        <Text style={styles.value}>{agendamento.nomeCliente}</Text>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Data e Hora:</Text>
-          <Text style={styles.value}>{formatarData(agendamento.data, agendamento.hora)}</Text>
-        </View>
+        <Text style={styles.label}>Telefone:</Text>
+        <Text style={styles.value}>{agendamento.telefone}</Text>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Serviço:</Text>
-          <Text style={styles.value}>{agendamento.servico}</Text>
-        </View>
+        <Text style={styles.label}>Data:</Text>
+        <Text style={styles.value}>{new Date(agendamento.data).toLocaleDateString()}</Text>
+
+        <Text style={styles.label}>Hora:</Text>
+        <Text style={styles.value}>{agendamento.hora}</Text>
+
+        <Text style={styles.label}>Serviço:</Text>
+        <Text style={styles.value}>{agendamento.servico}</Text>
 
         {agendamento.observacoes && (
-          <View style={styles.infoContainer}>
+          <>
             <Text style={styles.label}>Observações:</Text>
             <Text style={styles.value}>{agendamento.observacoes}</Text>
-          </View>
+          </>
         )}
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.label}>Contato:</Text>
-          <Text style={styles.value}>{cliente.telefone}</Text>
-          {cliente.email && (
-            <Text style={styles.value}>{cliente.email}</Text>
-          )}
-        </View>
+        <TouchableOpacity 
+          style={styles.excluirButton}
+          onPress={handleExcluir}
+        >
+          <Text style={styles.excluirButtonText}>Excluir Agendamento</Text>
+        </TouchableOpacity>
       </Card>
-    </ScrollView>
+    </View>
   );
 };
 
@@ -65,27 +81,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-  },
-  card: {
-    margin: 16,
     padding: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 24,
-    color: '#6200ee',
-  },
-  infoContainer: {
-    marginBottom: 16,
+  card: {
+    padding: 16,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: 'bold',
     color: '#666666',
     marginBottom: 4,
+    marginTop: 16,
   },
   value: {
+    fontSize: 18,
+    color: '#333333',
+    marginBottom: 8,
+  },
+  excluirButton: {
+    backgroundColor: '#ff4444',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  excluirButtonText: {
+    color: '#ffffff',
     fontSize: 16,
-    color: '#000000',
+    fontWeight: 'bold',
   },
 }); 
