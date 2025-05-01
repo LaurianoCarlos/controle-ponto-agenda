@@ -27,7 +27,7 @@ const Tab = createBottomTabNavigator<RootStackParamList>();
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AgendamentoStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen 
       name="AgendamentoLista" 
       component={AgendamentoListaScreen}
@@ -47,7 +47,7 @@ const AgendamentoStack = () => (
 );
 
 const PontoStack = () => (
-  <Stack.Navigator>
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen 
       name="Ponto" 
       component={PontoScreen}
