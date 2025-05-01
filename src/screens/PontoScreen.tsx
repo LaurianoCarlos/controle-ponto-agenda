@@ -41,8 +41,7 @@ export const PontoScreen: React.FC = () => {
 
   const verificarRegistroExistente = async () => {
     const dataFormatada = formatarDataParaString(dataSelecionada);
-    const pontos = await StorageService.getPontos();
-    const pontoExistente = pontos.find(p => p.data === dataFormatada);
+    const pontoExistente = await StorageService.getPontoByData(dataFormatada);
 
     if (pontoExistente) {
       setRegistroPonto({
@@ -51,7 +50,12 @@ export const PontoScreen: React.FC = () => {
         entradaAlmoco: pontoExistente.entradaAlmoco ? new Date(pontoExistente.entradaAlmoco) : undefined,
         saidaAlmoco: pontoExistente.saidaAlmoco ? new Date(pontoExistente.saidaAlmoco) : undefined,
       });
-      setRegistroTemporario({});
+      setRegistroTemporario({
+        entrada: new Date(pontoExistente.entrada),
+        saida: pontoExistente.saida ? new Date(pontoExistente.saida) : undefined,
+        entradaAlmoco: pontoExistente.entradaAlmoco ? new Date(pontoExistente.entradaAlmoco) : undefined,
+        saidaAlmoco: pontoExistente.saidaAlmoco ? new Date(pontoExistente.saidaAlmoco) : undefined,
+      });
     } else {
       setRegistroPonto({});
       setRegistroTemporario({});
@@ -78,35 +82,53 @@ export const PontoScreen: React.FC = () => {
     setModalVisible(true);
   };
 
-  const confirmarRegistroModal = () => {
+  const confirmarRegistroModal = async () => {
     setModalVisible(false);
     if (!horarioRegistro) return;
 
+    const dataFormatada = formatarDataParaString(dataSelecionada);
+    let updateData: Partial<Ponto> = {};
+
     switch (tipoRegistro) {
       case 'entrada':
+        updateData = { entrada: horarioRegistro };
         setRegistroTemporario(prev => ({
           ...prev,
           entrada: horarioRegistro,
         }));
         break;
       case 'saidaAlmoco':
+        updateData = { entradaAlmoco: horarioRegistro };
         setRegistroTemporario(prev => ({
           ...prev,
           entradaAlmoco: horarioRegistro,
         }));
         break;
       case 'voltaAlmoco':
+        updateData = { saidaAlmoco: horarioRegistro };
         setRegistroTemporario(prev => ({
           ...prev,
           saidaAlmoco: horarioRegistro,
         }));
         break;
       case 'saida':
+        updateData = { saida: horarioRegistro };
         setRegistroTemporario(prev => ({
           ...prev,
           saida: horarioRegistro,
         }));
         break;
+    }
+
+    try {
+      await StorageService.updatePonto(dataFormatada, updateData);
+      setRegistroPonto(prev => ({
+        ...prev,
+        ...updateData
+      }));
+    } catch (error) {
+      console.error('Erro ao salvar registro:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o registro');
     }
   };
 

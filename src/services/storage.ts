@@ -69,6 +69,42 @@ export const StorageService = {
     }
   },
 
+  getPontoByData: async (data: string): Promise<Ponto | null> => {
+    try {
+      const pontos = await StorageService.getPontos();
+      return pontos.find(p => p.data === data) || null;
+    } catch (error) {
+      console.error('Erro ao buscar ponto por data:', error);
+      return null;
+    }
+  },
+
+  updatePonto: async (data: string, updates: Partial<Ponto>): Promise<void> => {
+    try {
+      const pontos = await StorageService.getPontos();
+      const index = pontos.findIndex(p => p.data === data);
+      
+      if (index >= 0) {
+        pontos[index] = { ...pontos[index], ...updates };
+      } else {
+        const novoPonto: Ponto = {
+          id: Date.now().toString(),
+          data,
+          entrada: updates.entrada || new Date(),
+          saida: updates.saida,
+          entradaAlmoco: updates.entradaAlmoco,
+          saidaAlmoco: updates.saidaAlmoco
+        };
+        pontos.push(novoPonto);
+      }
+      
+      await AsyncStorage.setItem(STORAGE_KEYS.PONTOS, JSON.stringify(pontos));
+    } catch (error) {
+      console.error('Erro ao atualizar ponto:', error);
+      throw error;
+    }
+  },
+
   savePonto: async (ponto: Ponto): Promise<void> => {
     try {
       const pontos = await StorageService.getPontos();
