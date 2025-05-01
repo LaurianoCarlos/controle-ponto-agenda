@@ -20,6 +20,7 @@ export type RootStackParamList = {
   PontoStack: { screen: string };
   Ponto: undefined;
   HistoricoPonto: undefined;
+  NovoAgendamento: undefined;
 };
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
@@ -33,7 +34,7 @@ const AgendamentoStack = () => (
       options={{ title: 'Agendamentos' }}
     />
     <Stack.Screen 
-      name="Agendamentos" 
+      name="NovoAgendamento" 
       component={AgendamentoScreen}
       options={{ title: 'Novo Agendamento' }}
     />

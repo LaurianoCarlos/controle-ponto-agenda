@@ -10,7 +10,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
 
-type AgendamentoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Agendamentos'>;
+type AgendamentoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'NovoAgendamento'>;
 
 interface Props {
   navigation: AgendamentoScreenNavigationProp;
