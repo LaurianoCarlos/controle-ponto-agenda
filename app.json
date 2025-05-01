@@ -16,6 +16,12 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.lorokill.myapp"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "53c5cbbf-5054-4e1c-9a73-68d9c53a86ab"
       }
     }
   }

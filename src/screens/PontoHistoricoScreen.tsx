@@ -439,6 +439,8 @@ const styles = StyleSheet.create({
   },
   cardItem: {
     marginBottom: 12,
+    elevation: 2,
+    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
   },
   cardHeader: {
     flexDirection: 'row',

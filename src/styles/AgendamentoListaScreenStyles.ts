@@ -13,10 +13,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    boxShadow: '0px 2px 3.84px rgba(0, 0, 0, 0.25)',
   },
   headerTitle: {
     color: '#fff',
@@ -40,10 +37,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    boxShadow: '0px 1px 1.41px rgba(0, 0, 0, 0.2)',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -114,9 +108,11 @@ export const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 20,
+    padding: 24,
     width: '80%',
     maxWidth: 400,
+    elevation: 2,
+    boxShadow: '0px 1px 1.41px rgba(0, 0, 0, 0.2)',
   },
   modalTitle: {
     fontSize: 18,
@@ -151,10 +147,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    boxShadow: '0px 1px 1.41px rgba(0, 0, 0, 0.2)',
   },
   cardContent: {
     flex: 1,
