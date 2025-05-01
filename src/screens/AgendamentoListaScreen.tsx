@@ -195,13 +195,23 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.title}>Agendamentos</Text>
-          <TouchableOpacity 
-            style={styles.novoButton}
-            onPress={() => navigation.navigate('NovoAgendamento')}
-          >
-            <Ionicons name="add-circle" size={20} color="#fff" style={styles.buttonIcon} />
-            <Text style={styles.novoButtonText}>Novo</Text>
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity 
+              style={[styles.headerButton, styles.pontoButton]}
+              onPress={() => navigation.navigate('Ponto')}
+            >
+              <Ionicons name="time-outline" size={20} color="#fff" style={styles.buttonIcon} />
+              <Text style={styles.headerButtonText}>Ponto</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.headerButton, styles.novoButton]}
+              onPress={() => navigation.navigate('NovoAgendamento')}
+            >
+              <Ionicons name="add-circle" size={20} color="#fff" style={styles.buttonIcon} />
+              <Text style={styles.headerButtonText}>Novo</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
