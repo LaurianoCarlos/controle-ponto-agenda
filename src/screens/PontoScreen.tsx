@@ -242,7 +242,7 @@ export const PontoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4A90E2" />
+      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
       
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -259,11 +259,11 @@ export const PontoScreen: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Card style={styles.card}>
           <View style={styles.dateSection}>
             <View style={styles.dateHeader}>
-              <Ionicons name="calendar" size={24} color="#4A90E2" />
+              <Ionicons name="calendar" size={24} color="#6200ee" />
               <Text style={styles.dateTitle}>Data do Registro</Text>
             </View>
             
@@ -274,7 +274,7 @@ export const PontoScreen: React.FC = () => {
               <Text style={styles.dateText}>
                 {formatarDataParaExibicao(dataSelecionada)}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#666" />
+              <Ionicons name="chevron-down" size={20} color="#6200ee" />
             </TouchableOpacity>
 
             {mostrarSeletorData && (
@@ -304,7 +304,7 @@ export const PontoScreen: React.FC = () => {
                 style={[styles.recordButton, !registroTemporario.entrada && styles.recordButtonActive]}
                 onPress={registrarEntrada}
               >
-                <Text style={styles.recordButtonText}>
+                <Text style={[styles.recordButtonText, !registroTemporario.entrada && { color: '#fff' }]}>
                   {registroTemporario.entrada ? 'Alterar' : 'Registrar'}
                 </Text>
               </TouchableOpacity>
@@ -326,7 +326,7 @@ export const PontoScreen: React.FC = () => {
                 style={[styles.recordButton, !registroTemporario.entradaAlmoco && styles.recordButtonActive]}
                 onPress={registrarSaidaAlmoco}
               >
-                <Text style={styles.recordButtonText}>
+                <Text style={[styles.recordButtonText, !registroTemporario.entradaAlmoco && { color: '#fff' }]}>
                   {registroTemporario.entradaAlmoco ? 'Alterar' : 'Registrar'}
                 </Text>
               </TouchableOpacity>
@@ -348,7 +348,7 @@ export const PontoScreen: React.FC = () => {
                 style={[styles.recordButton, !registroTemporario.saidaAlmoco && styles.recordButtonActive]}
                 onPress={registrarVoltaAlmoco}
               >
-                <Text style={styles.recordButtonText}>
+                <Text style={[styles.recordButtonText, !registroTemporario.saidaAlmoco && { color: '#fff' }]}>
                   {registroTemporario.saidaAlmoco ? 'Alterar' : 'Registrar'}
                 </Text>
               </TouchableOpacity>
@@ -370,7 +370,7 @@ export const PontoScreen: React.FC = () => {
                 style={[styles.recordButton, !registroTemporario.saida && styles.recordButtonActive]}
                 onPress={registrarSaida}
               >
-                <Text style={styles.recordButtonText}>
+                <Text style={[styles.recordButtonText, !registroTemporario.saida && { color: '#fff' }]}>
                   {registroTemporario.saida ? 'Alterar' : 'Registrar'}
                 </Text>
               </TouchableOpacity>

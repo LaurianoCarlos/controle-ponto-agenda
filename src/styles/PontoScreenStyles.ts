@@ -1,16 +1,19 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#f5f5f5',
   },
   header: {
     backgroundColor: '#6200ee',
-    paddingTop: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
     paddingBottom: 20,
     elevation: 4,
-    boxShadow: '0px 2px 2px rgba(0, 0, 0, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   headerContent: {
     flexDirection: 'row',
@@ -32,18 +35,18 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#6200ee',
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   historicoButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
   },
   buttonIcon: {
     marginRight: 8,
   },
   headerButtonText: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   content: {
@@ -51,10 +54,21 @@ export const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   dateSection: {
     marginBottom: 24,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    padding: 16,
   },
   dateHeader: {
     flexDirection: 'row',
@@ -86,15 +100,16 @@ export const styles = StyleSheet.create({
   },
   recordCard: {
     backgroundColor: '#FFF',
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    marginBottom: 12,
   },
   recordHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   recordTitle: {
     fontSize: 16,
@@ -103,23 +118,25 @@ export const styles = StyleSheet.create({
     color: '#333',
   },
   recordTime: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#666',
-    marginBottom: 12,
+    color: '#6200ee',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   recordButton: {
-    backgroundColor: '#E0E0E0',
-    padding: 8,
-    borderRadius: 4,
+    backgroundColor: '#f0f0f0',
+    padding: 12,
+    borderRadius: 8,
     alignItems: 'center',
   },
   recordButtonActive: {
     backgroundColor: '#6200ee',
   },
   recordButtonText: {
-    color: '#FFF',
+    color: '#333',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   actionsContainer: {
     flexDirection: 'row',
@@ -129,9 +146,14 @@ export const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    padding: 12,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   confirmButton: {
     backgroundColor: '#4CAF50',
@@ -152,10 +174,15 @@ export const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#FFF',
-    borderRadius: 8,
+    borderRadius: 16,
     padding: 24,
-    width: '80%',
+    width: '85%',
     alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
   modalTitle: {
     fontSize: 20,
@@ -170,7 +197,7 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalTime: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#6200ee',
     marginBottom: 24,
@@ -180,10 +207,10 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
   modalButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    minWidth: 100,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    minWidth: 120,
     alignItems: 'center',
   },
   modalConfirmButton: {
@@ -195,5 +222,6 @@ export const styles = StyleSheet.create({
   modalButtonText: {
     color: '#FFF',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 }); 
