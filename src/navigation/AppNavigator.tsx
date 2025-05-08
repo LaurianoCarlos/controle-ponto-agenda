@@ -9,7 +9,8 @@ import { AgendamentoDetalheScreen } from '../screens/AgendamentoDetalheScreen';
 import { AgendamentoListaScreen } from '../screens/AgendamentoListaScreen';
 import { PontoScreen } from '../screens/PontoScreen';
 import { PontoHistoricoScreen } from '../screens/PontoHistoricoScreen';
-import { Agendamento } from '../types';
+import { PontoEdicaoScreen } from '../screens/PontoEdicaoScreen';
+import { Agendamento, Ponto } from '../types';
 
 // Definição dos tipos para navegação
 export type RootStackParamList = {
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   PontoStack: { screen: string };
   Ponto: undefined;
   HistoricoPonto: undefined;
+  PontoEdicao: { ponto: Ponto };
   NovoAgendamento: undefined;
 };
 
@@ -57,6 +59,11 @@ const PontoStack = () => (
       name="HistoricoPonto" 
       component={PontoHistoricoScreen}
       options={{ title: 'Histórico de Pontos' }}
+    />
+    <Stack.Screen 
+      name="PontoEdicao" 
+      component={PontoEdicaoScreen}
+      options={{ title: 'Editar Ponto' }}
     />
   </Stack.Navigator>
 );

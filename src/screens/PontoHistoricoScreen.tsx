@@ -3,11 +3,15 @@ import { View, Text, StyleSheet, FlatList, ScrollView, Alert, TouchableOpacity, 
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
 import { Ponto } from '../types';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { Calendar } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
 import { styles } from '../styles/PontoScreenStyles';
+
+type PontoHistoricoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'HistoricoPonto'>;
 
 interface ResumoHoras {
   totalHoras: number;
@@ -15,14 +19,11 @@ interface ResumoHoras {
 }
 
 export const PontoHistoricoScreen: React.FC = () => {
+  const navigation = useNavigation<PontoHistoricoScreenNavigationProp>();
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [mesSelecionado, setMesSelecionado] = useState<number>(new Date().getMonth());
   const [diasMarcados, setDiasMarcados] = useState<{[key: string]: {selected: boolean, marked: boolean, dotColor: string}}>({});
   const [resumoHoras, setResumoHoras] = useState<ResumoHoras>({ totalHoras: 0, horasExtras: 0 });
-  const [modalEdicaoVisible, setModalEdicaoVisible] = useState<boolean>(false);
-  const [pontoEmEdicao, setPontoEmEdicao] = useState<Ponto | null>(null);
-  const [mostrarSeletorHora, setMostrarSeletorHora] = useState<boolean>(false);
-  const [tipoHoraSelecionada, setTipoHoraSelecionada] = useState<'entrada' | 'saida' | 'entradaAlmoco' | 'saidaAlmoco' | null>(null);
   const [modalExclusaoVisible, setModalExclusaoVisible] = useState<boolean>(false);
   const [pontoParaExcluir, setPontoParaExcluir] = useState<Ponto | null>(null);
 
@@ -124,52 +125,8 @@ export const PontoHistoricoScreen: React.FC = () => {
     );
   };
 
-  const abrirModalEdicao = (ponto: Ponto) => {
-    setPontoEmEdicao({
-      ...ponto,
-      entrada: new Date(ponto.entrada),
-      saida: ponto.saida ? new Date(ponto.saida) : undefined,
-      entradaAlmoco: ponto.entradaAlmoco ? new Date(ponto.entradaAlmoco) : undefined,
-      saidaAlmoco: ponto.saidaAlmoco ? new Date(ponto.saidaAlmoco) : undefined,
-    });
-    setModalEdicaoVisible(true);
-  };
-
-  const fecharModalEdicao = () => {
-    setModalEdicaoVisible(false);
-    setPontoEmEdicao(null);
-  };
-
-  const selecionarHora = (tipo: 'entrada' | 'saida' | 'entradaAlmoco' | 'saidaAlmoco') => {
-    setTipoHoraSelecionada(tipo);
-    setMostrarSeletorHora(true);
-  };
-
-  const onHoraChange = (event: any, horaSelecionada?: Date) => {
-    setMostrarSeletorHora(false);
-    if (horaSelecionada && pontoEmEdicao && tipoHoraSelecionada) {
-      const novaData = new Date(pontoEmEdicao[tipoHoraSelecionada] || new Date());
-      novaData.setHours(horaSelecionada.getHours());
-      novaData.setMinutes(horaSelecionada.getMinutes());
-      
-      setPontoEmEdicao({
-        ...pontoEmEdicao,
-        [tipoHoraSelecionada]: novaData,
-      });
-    }
-  };
-
-  const salvarEdicao = async () => {
-    if (!pontoEmEdicao) return;
-
-    try {
-      await StorageService.savePonto(pontoEmEdicao);
-      await carregarPontos();
-      fecharModalEdicao();
-      Alert.alert('Sucesso', 'Registro atualizado com sucesso!');
-    } catch (error) {
-      Alert.alert('Erro', 'Não foi possível atualizar o registro.');
-    }
+  const abrirEdicao = (ponto: Ponto) => {
+    navigation.navigate('PontoEdicao', { ponto });
   };
 
   const mostrarModalExclusao = (ponto: Ponto) => {
@@ -247,7 +204,7 @@ export const PontoHistoricoScreen: React.FC = () => {
             <View style={styles.recordActions}>
               <TouchableOpacity 
                 style={[styles.recordActionButton, styles.recordActionButtonEdit]}
-                onPress={() => abrirModalEdicao(item)}
+                onPress={() => abrirEdicao(item)}
               >
                 <Text style={styles.recordActionButtonEditText}>Editar</Text>
               </TouchableOpacity>
@@ -335,83 +292,6 @@ export const PontoHistoricoScreen: React.FC = () => {
       </ScrollView>
 
       <Modal
-        visible={modalEdicaoVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={fecharModalEdicao}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar Registro</Text>
-            <Text style={styles.modalSubtitle}>{pontoEmEdicao ? formatarData(pontoEmEdicao.data) : ''}</Text>
-
-            <View style={styles.horaEditContainer}>
-              <Text style={styles.horaLabel}>Entrada:</Text>
-              <TouchableOpacity
-                style={styles.horaButton}
-                onPress={() => selecionarHora('entrada')}
-              >
-                <Text style={styles.horaText}>
-                  {pontoEmEdicao?.entrada ? formatarHora(pontoEmEdicao.entrada) : '--:--'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.horaEditContainer}>
-              <Text style={styles.horaLabel}>Saída Almoço:</Text>
-              <TouchableOpacity
-                style={styles.horaButton}
-                onPress={() => selecionarHora('entradaAlmoco')}
-              >
-                <Text style={styles.horaText}>
-                  {pontoEmEdicao?.entradaAlmoco ? formatarHora(pontoEmEdicao.entradaAlmoco) : '--:--'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.horaEditContainer}>
-              <Text style={styles.horaLabel}>Volta Almoço:</Text>
-              <TouchableOpacity
-                style={styles.horaButton}
-                onPress={() => selecionarHora('saidaAlmoco')}
-              >
-                <Text style={styles.horaText}>
-                  {pontoEmEdicao?.saidaAlmoco ? formatarHora(pontoEmEdicao.saidaAlmoco) : '--:--'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.horaEditContainer}>
-              <Text style={styles.horaLabel}>Saída:</Text>
-              <TouchableOpacity
-                style={styles.horaButton}
-                onPress={() => selecionarHora('saida')}
-              >
-                <Text style={styles.horaText}>
-                  {pontoEmEdicao?.saida ? formatarHora(pontoEmEdicao.saida) : '--:--'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={fecharModalEdicao}
-              >
-                <Text style={styles.modalButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.saveButton]}
-                onPress={salvarEdicao}
-              >
-                <Text style={styles.modalButtonText}>Salvar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal
         visible={modalExclusaoVisible}
         transparent
         animationType="fade"
@@ -446,16 +326,6 @@ export const PontoHistoricoScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
-
-      {mostrarSeletorHora && (
-        <DateTimePicker
-          value={pontoEmEdicao?.[tipoHoraSelecionada || 'entrada'] || new Date()}
-          mode="time"
-          is24Hour={true}
-          display="default"
-          onChange={onHoraChange}
-        />
-      )}
     </View>
   );
 }; 
