@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Calendar } from 'react-native-calendars';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
+import { styles } from '../styles/PontoScreenStyles';
 
 interface ResumoHoras {
   totalHoras: number;
@@ -195,91 +196,143 @@ export const PontoHistoricoScreen: React.FC = () => {
     setPontoParaExcluir(null);
   };
 
-  const renderItem = ({ item }: { item: Ponto }) => (
-    <Card style={styles.cardItem}>
-      <View style={styles.cardHeader}>
-        <Text style={styles.data}>{formatarData(item.data)}</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            onPress={() => abrirModalEdicao(item)}
-            style={[styles.actionButton, styles.editButton]}
-          >
-            <Ionicons name="create-outline" size={20} color="#ffffff" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => mostrarModalExclusao(item)}
-            style={[styles.actionButton, styles.deleteButton]}
-          >
-            <Ionicons name="trash-outline" size={20} color="#ffffff" />
-          </TouchableOpacity>
+  const renderPontoItem = ({ item }: { item: Ponto }) => {
+    const horasTrabalhadas = calcularHorasTrabalhadas(item);
+    const status = horasTrabalhadas >= 8 ? 'Completo' : 'Incompleto';
+    const statusColor = horasTrabalhadas >= 8 ? '#4CAF50' : '#FFA000';
+
+    return (
+      <Card style={styles.recordCard}>
+        <View style={styles.recordCardContent}>
+          <View style={styles.recordInfo}>
+            <View style={styles.recordHeader}>
+              <Ionicons name="calendar" size={20} color="#6200ee" />
+              <Text style={styles.recordTitle}>{formatarData(item.data)}</Text>
+            </View>
+            
+            <View style={[styles.recordStatus, { backgroundColor: status === 'Completo' ? '#E8F5E9' : '#FFF3E0' }]}>
+              <Text style={[styles.recordStatusText, { color: statusColor }]}>{status}</Text>
+            </View>
+
+            <View style={styles.recordDetails}>
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Entrada</Text>
+                <Text style={styles.recordDetailValue}>
+                  {item.entrada ? new Date(item.entrada).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                </Text>
+              </View>
+              
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Saída Almoço</Text>
+                <Text style={styles.recordDetailValue}>
+                  {item.entradaAlmoco ? new Date(item.entradaAlmoco).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                </Text>
+              </View>
+              
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Volta Almoço</Text>
+                <Text style={styles.recordDetailValue}>
+                  {item.saidaAlmoco ? new Date(item.saidaAlmoco).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                </Text>
+              </View>
+              
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Saída</Text>
+                <Text style={styles.recordDetailValue}>
+                  {item.saida ? new Date(item.saida).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.recordActions}>
+              <TouchableOpacity 
+                style={[styles.recordActionButton, styles.recordActionButtonEdit]}
+                onPress={() => abrirModalEdicao(item)}
+              >
+                <Text style={styles.recordActionButtonEditText}>Editar</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.recordActionButton, styles.recordActionButtonDelete]}
+                onPress={() => mostrarModalExclusao(item)}
+              >
+                <Text style={styles.recordActionButtonDeleteText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-      </View>
-      <View style={styles.horariosContainer}>
-        <Text style={styles.horario}>Entrada: {formatarHora(item.entrada)}</Text>
-        {item.saida && (
-          <Text style={styles.horario}>Saída: {formatarHora(item.saida)}</Text>
-        )}
-        {item.entradaAlmoco && (
-          <Text style={styles.horario}>Entrada Almoço: {formatarHora(item.entradaAlmoco)}</Text>
-        )}
-        {item.saidaAlmoco && (
-          <Text style={styles.horario}>Saída Almoço: {formatarHora(item.saidaAlmoco)}</Text>
-        )}
-      </View>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Histórico de Pontos</Text>
-      
-      <View style={styles.calendarContainer}>
-        <Calendar
-          markedDates={diasMarcados}
-          markingType="dot"
-          theme={{
-            todayTextColor: '#6200ee',
-            selectedDayBackgroundColor: '#6200ee',
-            selectedDayTextColor: '#ffffff',
-            dotColor: '#6200ee',
-            arrowColor: '#6200ee',
-            monthTextColor: '#000000',
-            textDayFontWeight: '300',
-            textMonthFontWeight: 'bold',
-            textDayHeaderFontWeight: '300',
-            textDayFontSize: 16,
-            textMonthFontSize: 16,
-            textDayHeaderFontSize: 16
-          }}
-          onMonthChange={(month: { month: number }) => {
-            setMesSelecionado(month.month - 1);
-          }}
-        />
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>Histórico de Pontos</Text>
+        </View>
       </View>
 
-      <View style={styles.resumoContainer}>
-        <Card style={styles.resumoCard}>
-          <Text style={styles.resumoTitle}>Resumo do Mês</Text>
-          <View style={styles.resumoItem}>
-            <Text style={styles.resumoLabel}>Total de Horas:</Text>
-            <Text style={styles.resumoValue}>{resumoHoras.totalHoras}h</Text>
-          </View>
-          <View style={styles.resumoItem}>
-            <Text style={styles.resumoLabel}>Horas Extras:</Text>
-            <Text style={[styles.resumoValue, resumoHoras.horasExtras > 0 ? styles.horasExtras : null]}>
-              {resumoHoras.horasExtras}h
-            </Text>
+      <ScrollView style={styles.content}>
+        <Card style={styles.card}>
+          <View style={styles.dateSection}>
+            <View style={styles.dateHeader}>
+              <Ionicons name="calendar" size={24} color="#6200ee" />
+              <Text style={styles.dateTitle}>Calendário</Text>
+            </View>
+            
+            <Calendar
+              markedDates={diasMarcados}
+              markingType="dot"
+              theme={{
+                todayTextColor: '#6200ee',
+                selectedDayBackgroundColor: '#6200ee',
+                selectedDayTextColor: '#ffffff',
+                dotColor: '#6200ee',
+                arrowColor: '#6200ee',
+                monthTextColor: '#000000',
+                textDayFontWeight: '300',
+                textMonthFontWeight: 'bold',
+                textDayHeaderFontWeight: '300',
+                textDayFontSize: 16,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 16
+              }}
+              onMonthChange={(month: { month: number }) => {
+                setMesSelecionado(month.month - 1);
+              }}
+            />
           </View>
         </Card>
-      </View>
 
-      <FlatList
-        data={pontos}
-        renderItem={renderItem}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={true}
-      />
+        <Card style={styles.card}>
+          <View style={styles.dateSection}>
+            <View style={styles.dateHeader}>
+              <Ionicons name="time" size={24} color="#6200ee" />
+              <Text style={styles.dateTitle}>Resumo do Mês</Text>
+            </View>
+            
+            <View style={styles.recordDetails}>
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Total de Horas</Text>
+                <Text style={styles.recordDetailValue}>{resumoHoras.totalHoras}h</Text>
+              </View>
+              
+              <View style={styles.recordDetail}>
+                <Text style={styles.recordDetailLabel}>Horas Extras</Text>
+                <Text style={styles.recordDetailValue}>{resumoHoras.horasExtras}h</Text>
+              </View>
+            </View>
+          </View>
+        </Card>
+
+        <FlatList
+          data={pontos}
+          renderItem={renderPontoItem}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+        />
+      </ScrollView>
 
       <Modal
         visible={modalEdicaoVisible}
@@ -405,191 +458,4 @@ export const PontoHistoricoScreen: React.FC = () => {
       )}
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    textAlign: 'center',
-    padding: 16,
-  },
-  calendarContainer: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    margin: 16,
-    marginTop: 0,
-    elevation: 2,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  listContainer: {
-    padding: 16,
-    paddingTop: 0,
-  },
-  cardItem: {
-    marginBottom: 12,
-    elevation: 2,
-    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  data: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionButton: {
-    padding: 8,
-    borderRadius: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  editButton: {
-    backgroundColor: '#4CAF50',
-  },
-  deleteButton: {
-    backgroundColor: '#f44336',
-  },
-  horariosContainer: {
-    gap: 4,
-  },
-  horario: {
-    fontSize: 14,
-    color: '#666666',
-  },
-  resumoContainer: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  resumoCard: {
-    padding: 16,
-  },
-  resumoTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  resumoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  resumoLabel: {
-    fontSize: 16,
-    color: '#666666',
-  },
-  resumoValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  horasExtras: {
-    color: '#f44336',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 24,
-    width: '90%',
-    maxWidth: 400,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  modalSubtitle: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-  horaEditContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  horaLabel: {
-    fontSize: 16,
-    color: '#333333',
-    flex: 1,
-  },
-  horaButton: {
-    backgroundColor: '#f5f5f5',
-    padding: 12,
-    borderRadius: 4,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  horaText: {
-    fontSize: 16,
-    color: '#333333',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 12,
-    marginTop: 24,
-  },
-  modalButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: '#f44336',
-  },
-  saveButton: {
-    backgroundColor: '#4CAF50',
-  },
-  modalButtonText: {
-    color: '#ffffff',
-    fontWeight: 'bold',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    gap: 8,
-  },
-  modalDeleteButton: {
-    backgroundColor: '#4A90E2',
-  },
-  modalCancelButton: {
-    backgroundColor: '#f44336',
-  },
-  modalText: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 24,
-    textAlign: 'center',
-  },
-}); 
+}; 

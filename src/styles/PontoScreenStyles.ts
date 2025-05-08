@@ -105,6 +105,11 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
   recordHeader: {
     flexDirection: 'row',
@@ -129,6 +134,11 @@ export const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
   },
   recordButtonActive: {
     backgroundColor: '#6200ee',
@@ -223,5 +233,113 @@ export const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  recordCardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  recordInfo: {
+    flex: 1,
+  },
+  recordStatus: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#E8F5E9',
+  },
+  recordStatusText: {
+    color: '#4CAF50',
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+  recordDetails: {
+    marginTop: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  recordDetail: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  recordDetailLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 4,
+  },
+  recordDetailValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  recordActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 12,
+    gap: 8,
+  },
+  recordActionButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: '#f0f0f0',
+  },
+  recordActionButtonText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  recordActionButtonEdit: {
+    backgroundColor: '#E3F2FD',
+  },
+  recordActionButtonDelete: {
+    backgroundColor: '#FFEBEE',
+  },
+  recordActionButtonEditText: {
+    color: '#1976D2',
+  },
+  recordActionButtonDeleteText: {
+    color: '#D32F2F',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: '#666666',
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  horaEditContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  horaLabel: {
+    fontSize: 16,
+    color: '#333333',
+    flex: 1,
+  },
+  horaButton: {
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 4,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  horaText: {
+    fontSize: 16,
+    color: '#333333',
+  },
+  saveButton: {
+    backgroundColor: '#4CAF50',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  modalDeleteButton: {
+    backgroundColor: '#4A90E2',
   },
 }); 
