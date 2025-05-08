@@ -137,46 +137,46 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.cardContent}>
         <View style={styles.cardInfo}>
           <View style={styles.nomeContainer}>
-            <Ionicons name="person-circle-outline" size={20} color="#6200ee" />
+            <Ionicons name="person-circle-outline" size={24} color="#6200ee" />
             <Text style={styles.nome}>{item.nomeCliente}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="call-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Ionicons name="call-outline" size={18} color="#6200ee" style={styles.infoIcon} />
             <Text style={styles.telefone}>{item.telefone}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Ionicons name="time-outline" size={18} color="#6200ee" style={styles.infoIcon} />
             <Text style={styles.horario}>{item.hora}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="cut-outline" size={16} color="#666" style={styles.infoIcon} />
+            <Ionicons name="cut-outline" size={18} color="#6200ee" style={styles.infoIcon} />
             <Text style={styles.servico}>{item.servico}</Text>
           </View>
         </View>
         
-        <View style={styles.cardActions}>
+        <View style={styles.actionButtons}>
           <TouchableOpacity 
             style={[styles.actionButton, styles.whatsappButton]}
             onPress={() => abrirWhatsApp(item.telefone)}
           >
-            <Ionicons name="logo-whatsapp" size={18} color="#fff" />
+            <Ionicons name="logo-whatsapp" size={20} color="#fff" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.actionButton, styles.detailsButton]}
             onPress={() => navigation.navigate('AgendamentoDetalhe', { agendamento: item })}
           >
-            <Ionicons name="eye-outline" size={18} color="#fff" />
+            <Ionicons name="eye-outline" size={20} color="#fff" />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => mostrarModalExclusao(item)}
           >
-            <Ionicons name="trash-outline" size={18} color="#fff" />
+            <Ionicons name="trash-outline" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </View>
