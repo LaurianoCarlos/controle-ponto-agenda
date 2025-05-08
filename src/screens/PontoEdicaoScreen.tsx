@@ -95,7 +95,7 @@ export const PontoEdicaoScreen: React.FC = () => {
         <Card style={styles.card}>
           <View style={styles.dateSection}>
             <View style={styles.dateHeader}>
-              <Ionicons name="calendar" size={24} color="#6200ee" />
+              <Ionicons name="calendar" size={24} color="#00BCD4" />
               <Text style={styles.dateTitle}>{formatarData(pontoEditado.data)}</Text>
             </View>
 
@@ -175,7 +175,7 @@ export const PontoEdicaoScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Ionicons name="time" size={32} color="#6200ee" />
+              <Ionicons name="time" size={32} color="#00BCD4" />
               <Text style={styles.modalTitle}>Selecionar Horário</Text>
             </View>
 

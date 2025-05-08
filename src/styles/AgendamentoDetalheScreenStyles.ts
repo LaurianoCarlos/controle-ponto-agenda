@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
     paddingTop: Platform.OS === 'ios' ? 50 : StatusBar.currentHeight,
     paddingBottom: 16,
     flexDirection: 'row',
@@ -15,6 +15,12 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     elevation: 4,
     boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.2)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   backButton: {
     padding: 8,

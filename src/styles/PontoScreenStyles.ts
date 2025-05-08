@@ -6,7 +6,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
     paddingTop: Platform.OS === 'ios' ? 50 : 20,
     paddingBottom: 20,
     elevation: 4,
@@ -125,7 +125,7 @@ export const styles = StyleSheet.create({
   recordTime: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#6200ee',
+    color: '#00BCD4',
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -141,7 +141,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   recordButtonActive: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
   },
   recordButtonText: {
     color: '#333',
@@ -222,7 +222,7 @@ export const styles = StyleSheet.create({
   modalTime: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#6200ee',
+    color: '#00BCD4',
     marginBottom: 24,
   },
   modalActions: {

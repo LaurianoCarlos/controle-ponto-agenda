@@ -39,7 +39,7 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       dadosAgendamentos.forEach(agendamento => {
         try {
           const dataFormatada = new Date(agendamento.data).toISOString().split('T')[0];
-          datasMarcadas[dataFormatada] = { marked: true, dotColor: '#6200ee' };
+          datasMarcadas[dataFormatada] = { marked: true, dotColor: '#00BCD4' };
         } catch (error) {
           console.error('Erro ao formatar data do agendamento:', error);
         }
@@ -137,22 +137,22 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
       <View style={styles.cardContent}>
         <View style={styles.cardInfo}>
           <View style={styles.nomeContainer}>
-            <Ionicons name="person-circle-outline" size={24} color="#6200ee" />
+            <Ionicons name="person-circle-outline" size={24} color="#00BCD4" />
             <Text style={styles.nome}>{item.nomeCliente}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="call-outline" size={18} color="#6200ee" style={styles.infoIcon} />
+            <Ionicons name="call-outline" size={18} color="#00BCD4" style={styles.infoIcon} />
             <Text style={styles.telefone}>{item.telefone}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="time-outline" size={18} color="#6200ee" style={styles.infoIcon} />
+            <Ionicons name="time-outline" size={18} color="#00BCD4" style={styles.infoIcon} />
             <Text style={styles.horario}>{item.hora}</Text>
           </View>
           
           <View style={styles.infoRow}>
-            <Ionicons name="cut-outline" size={18} color="#6200ee" style={styles.infoIcon} />
+            <Ionicons name="cut-outline" size={18} color="#00BCD4" style={styles.infoIcon} />
             <Text style={styles.servico}>{item.servico}</Text>
           </View>
         </View>
@@ -185,7 +185,7 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
+      <StatusBar barStyle="light-content" backgroundColor="#00BCD4" />
       
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -215,15 +215,15 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.dateButton}
           onPress={() => setShowCalendar(true)}
         >
-          <Ionicons name="calendar" size={20} color="#6200ee" style={styles.dateIcon} />
+          <Ionicons name="calendar" size={20} color="#00BCD4" style={styles.dateIcon} />
           <Text style={styles.dateButtonText}>
             {dataSelecionada.toLocaleDateString()}
           </Text>
-          <Ionicons name="chevron-down" size={16} color="#6200ee" style={styles.dateIcon} />
+          <Ionicons name="chevron-down" size={16} color="#00BCD4" style={styles.dateIcon} />
         </TouchableOpacity>
         
         <View style={styles.agendamentosCountContainer}>
-          <Ionicons name="calendar-number" size={16} color="#6200ee" />
+          <Ionicons name="calendar-number" size={16} color="#00BCD4" />
           <Text style={styles.agendamentosCount}>
             {agendamentosFiltrados.length} {agendamentosFiltrados.length === 1 ? 'agendamento' : 'agendamentos'}
           </Text>
@@ -232,7 +232,7 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#6200ee" />
+          <ActivityIndicator size="large" color="#00BCD4" />
         </View>
       ) : (
         <FlatList
@@ -275,18 +275,18 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
                 ...markedDates,
                 [dataSelecionada.toISOString().split('T')[0]]: { 
                   selected: true, 
-                  selectedColor: '#6200ee',
+                  selectedColor: '#00BCD4',
                   marked: markedDates[dataSelecionada.toISOString().split('T')[0]]?.marked,
-                  dotColor: '#6200ee'
+                  dotColor: '#00BCD4'
                 }
               }}
               theme={{
-                todayTextColor: '#6200ee',
-                selectedDayBackgroundColor: '#6200ee',
+                todayTextColor: '#00BCD4',
+                selectedDayBackgroundColor: '#00BCD4',
                 selectedDayTextColor: '#ffffff',
-                dotColor: '#6200ee',
-                arrowColor: '#6200ee',
-                monthTextColor: '#6200ee',
+                dotColor: '#00BCD4',
+                arrowColor: '#00BCD4',
+                monthTextColor: '#00BCD4',
                 textDayFontWeight: '300',
                 textMonthFontWeight: 'bold',
                 textDayHeaderFontWeight: '300',

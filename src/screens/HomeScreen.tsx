@@ -25,7 +25,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
+      <StatusBar barStyle="light-content" backgroundColor="#00BCD4" />
       
       <View style={styles.header}>
         <Text style={styles.headerTitle}>App Cachos</Text>
@@ -35,7 +35,7 @@ export const HomeScreen: React.FC = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <Card style={styles.card}>
           <View style={styles.cardHeader}>
-            <Ionicons name="time-outline" size={24} color="#6200ee" />
+            <Ionicons name="time-outline" size={24} color="#00BCD4" />
             <Text style={styles.cardTitle}>Registro de Ponto</Text>
           </View>
           
@@ -55,7 +55,7 @@ export const HomeScreen: React.FC = () => {
               onPress={navegarParaHistoricoPonto}
             >
               <View style={[styles.buttonIconContainer, styles.buttonIconContainerSecondary]}>
-                <Ionicons name="bar-chart" size={24} color="#6200ee" />
+                <Ionicons name="bar-chart" size={24} color="#00BCD4" />
               </View>
               <Text style={styles.buttonTextSecondary}>Histórico</Text>
             </TouchableOpacity>
@@ -64,7 +64,7 @@ export const HomeScreen: React.FC = () => {
 
         <Card style={styles.card}>
           <View style={styles.cardHeader}>
-            <Ionicons name="calendar-outline" size={24} color="#6200ee" />
+            <Ionicons name="calendar-outline" size={24} color="#00BCD4" />
             <Text style={styles.cardTitle}>Agendamentos</Text>
           </View>
           
@@ -83,21 +83,21 @@ export const HomeScreen: React.FC = () => {
 
         <Card style={styles.card}>
           <View style={styles.cardHeader}>
-            <Ionicons name="grid-outline" size={24} color="#6200ee" />
+            <Ionicons name="grid-outline" size={24} color="#00BCD4" />
             <Text style={styles.cardTitle}>Funcionalidades</Text>
           </View>
           
           <View style={styles.featureList}>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#6200ee" />
+              <Ionicons name="checkmark-circle" size={20} color="#00BCD4" />
               <Text style={styles.featureText}>Registro de ponto</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#6200ee" />
+              <Ionicons name="checkmark-circle" size={20} color="#00BCD4" />
               <Text style={styles.featureText}>Histórico de pontos</Text>
             </View>
             <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#6200ee" />
+              <Ionicons name="checkmark-circle" size={20} color="#00BCD4" />
               <Text style={styles.featureText}>Agendamentos</Text>
             </View>
           </View>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   header: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
     padding: 24,
     paddingTop: 48,
     borderBottomLeftRadius: 24,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 8,
-    color: '#333333',
+    color: '#00BCD4',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   button: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonSecondary: {
-    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    backgroundColor: 'rgba(0, 188, 212, 0.1)',
   },
   buttonIconContainer: {
     width: 40,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   buttonIconContainerSecondary: {
-    backgroundColor: 'rgba(98, 0, 238, 0.1)',
+    backgroundColor: 'rgba(0, 188, 212, 0.1)',
   },
   buttonText: {
     color: '#ffffff',
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   buttonTextSecondary: {
-    color: '#6200ee',
+    color: '#00BCD4',
     fontSize: 16,
     fontWeight: 'bold',
   },

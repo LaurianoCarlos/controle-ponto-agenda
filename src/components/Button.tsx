@@ -51,7 +51,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   primaryButton: {
-    backgroundColor: '#6200ee',
+    backgroundColor: '#00BCD4',
+    borderWidth: 0,
   },
   secondaryButton: {
     backgroundColor: '#03dac6',
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   outlineButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#6200ee',
+    borderColor: '#00BCD4',
   },
   disabledButton: {
     backgroundColor: '#e0e0e0',
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   outlineText: {
-    color: '#6200ee',
+    color: '#00BCD4',
   },
   disabledText: {
     color: '#9e9e9e',

@@ -163,7 +163,7 @@ export const PontoHistoricoScreen: React.FC = () => {
         <View style={styles.recordCardContent}>
           <View style={styles.recordInfo}>
             <View style={styles.recordHeader}>
-              <Ionicons name="calendar" size={20} color="#6200ee" />
+              <Ionicons name="calendar" size={20} color="#00BCD4" />
               <Text style={styles.recordTitle}>{formatarData(item.data)}</Text>
             </View>
             
@@ -234,7 +234,7 @@ export const PontoHistoricoScreen: React.FC = () => {
         <Card style={styles.card}>
           <View style={styles.dateSection}>
             <View style={styles.dateHeader}>
-              <Ionicons name="calendar" size={24} color="#6200ee" />
+              <Ionicons name="calendar" size={24} color="#00BCD4" />
               <Text style={styles.dateTitle}>Calendário</Text>
             </View>
             
@@ -242,11 +242,11 @@ export const PontoHistoricoScreen: React.FC = () => {
               markedDates={diasMarcados}
               markingType="dot"
               theme={{
-                todayTextColor: '#6200ee',
-                selectedDayBackgroundColor: '#6200ee',
+                todayTextColor: '#00BCD4',
+                selectedDayBackgroundColor: '#00BCD4',
                 selectedDayTextColor: '#ffffff',
-                dotColor: '#6200ee',
-                arrowColor: '#6200ee',
+                dotColor: '#00BCD4',
+                arrowColor: '#00BCD4',
                 monthTextColor: '#000000',
                 textDayFontWeight: '300',
                 textMonthFontWeight: 'bold',
@@ -265,7 +265,7 @@ export const PontoHistoricoScreen: React.FC = () => {
         <Card style={styles.card}>
           <View style={styles.dateSection}>
             <View style={styles.dateHeader}>
-              <Ionicons name="time" size={24} color="#6200ee" />
+              <Ionicons name="time" size={24} color="#00BCD4" />
               <Text style={styles.dateTitle}>Resumo do Mês</Text>
             </View>
             

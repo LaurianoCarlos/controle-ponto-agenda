@@ -73,7 +73,7 @@ export const AppNavigator = () => {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: '#6200ee',
+          tabBarActiveTintColor: '#00BCD4',
           tabBarInactiveTintColor: '#666666',
           tabBarStyle: {
             paddingBottom: 5,

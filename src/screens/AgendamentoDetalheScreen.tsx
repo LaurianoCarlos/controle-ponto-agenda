@@ -38,7 +38,7 @@ export const AgendamentoDetalheScreen: React.FC<Props> = ({ navigation, route })
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
+      <StatusBar barStyle="light-content" backgroundColor="#00BCD4" />
       
       <View style={styles.header}>
         <TouchableOpacity 

@@ -242,7 +242,7 @@ export const PontoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#6200ee" />
+      <StatusBar barStyle="light-content" backgroundColor="#00BCD4" />
       
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -263,7 +263,7 @@ export const PontoScreen: React.FC = () => {
         <Card style={styles.card}>
           <View style={styles.dateSection}>
             <View style={styles.dateHeader}>
-              <Ionicons name="calendar" size={24} color="#6200ee" />
+              <Ionicons name="calendar" size={24} color="#00BCD4" />
               <Text style={styles.dateTitle}>Data do Registro</Text>
             </View>
             
@@ -274,7 +274,7 @@ export const PontoScreen: React.FC = () => {
               <Text style={styles.dateText}>
                 {formatarDataParaExibicao(dataSelecionada)}
               </Text>
-              <Ionicons name="chevron-down" size={20} color="#6200ee" />
+              <Ionicons name="chevron-down" size={20} color="#00BCD4" />
             </TouchableOpacity>
 
             {mostrarSeletorData && (
