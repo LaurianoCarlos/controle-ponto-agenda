@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, ScrollView, Alert, TouchableOpacity, Modal, Platform } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
@@ -25,7 +25,7 @@ export const PontoHistoricoScreen: React.FC = () => {
   const [modalExclusaoVisible, setModalExclusaoVisible] = useState<boolean>(false);
   const [pontoParaExcluir, setPontoParaExcluir] = useState<Ponto | null>(null);
 
-  const calcularHorasTrabalhadas = (ponto: Ponto): number => {
+  const calcularHorasTrabalhadas = useCallback((ponto: Ponto): number => {
     if (!ponto.entrada || !ponto.saida) return 0;
 
     const entrada = new Date(ponto.entrada);
@@ -33,7 +33,6 @@ export const PontoHistoricoScreen: React.FC = () => {
     
     let horasTrabalhadas = (saida.getTime() - entrada.getTime()) / (1000 * 60 * 60);
 
-    // Se tiver horário de almoço, subtrai o tempo
     if (ponto.entradaAlmoco && ponto.saidaAlmoco) {
       const entradaAlmoco = new Date(ponto.entradaAlmoco);
       const saidaAlmoco = new Date(ponto.saidaAlmoco);
@@ -42,9 +41,9 @@ export const PontoHistoricoScreen: React.FC = () => {
     }
 
     return horasTrabalhadas;
-  };
+  }, []);
 
-  const calcularResumoHoras = (pontos: Ponto[]): ResumoHoras => {
+  const calcularResumoHoras = useCallback((pontos: Ponto[]): ResumoHoras => {
     let totalHoras = 0;
     let horasExtras = 0;
 
@@ -61,9 +60,9 @@ export const PontoHistoricoScreen: React.FC = () => {
       totalHoras: Number(totalHoras.toFixed(2)),
       horasExtras: Number(horasExtras.toFixed(2))
     };
-  };
+  }, [calcularHorasTrabalhadas]);
 
-  const carregarPontos = async () => {
+  const carregarPontos = useCallback(async () => {
     const todosPontos = await StorageService.getPontos();
     const pontosFiltrados = todosPontos.filter(ponto => {
       const [ano, mes] = ponto.data.split('-').map(Number);
@@ -72,7 +71,6 @@ export const PontoHistoricoScreen: React.FC = () => {
     setPontos(pontosFiltrados);
     setResumoHoras(calcularResumoHoras(pontosFiltrados));
 
-    // Prepara os dias marcados para o calendário
     const marcacoes: {[key: string]: {selected: boolean, marked: boolean, dotColor: string}} = {};
     todosPontos.forEach(ponto => {
       marcacoes[ponto.data] = {
@@ -82,23 +80,22 @@ export const PontoHistoricoScreen: React.FC = () => {
       };
     });
     setDiasMarcados(marcacoes);
-  };
+  }, [mesSelecionado, calcularResumoHoras]);
 
-  // Atualiza os dados quando a tela recebe foco
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       carregarPontos();
-    }, [mesSelecionado])
+    }, [carregarPontos])
   );
 
-  const formatarData = (data: string) => {
+  const formatarData = useCallback((data: string) => {
     const [ano, mes, dia] = data.split('-').map(Number);
     return new Date(ano, mes - 1, dia).toLocaleDateString('pt-BR');
-  };
+  }, []);
 
-  const formatarHora = (data: Date) => {
+  const formatarHora = useCallback((data: Date) => {
     return new Date(data).toLocaleTimeString('pt-BR');
-  };
+  }, []);
 
   const excluirPonto = async (data: string) => {
     Alert.alert(

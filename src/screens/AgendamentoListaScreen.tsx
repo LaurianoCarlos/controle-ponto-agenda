@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Alert, Platform, Linking, StatusBar, ScrollView, ActivityIndicator } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
@@ -53,6 +53,13 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
     }
   }, []);
 
+  const agendamentosFiltrados = useMemo(() => {
+    return agendamentos.filter(agendamento => {
+      const dataAgendamento = new Date(agendamento.data);
+      return dataAgendamento.toDateString() === dataSelecionada.toDateString();
+    });
+  }, [agendamentos, dataSelecionada]);
+
   useEffect(() => {
     carregarDados();
   }, []);
@@ -79,18 +86,6 @@ export const AgendamentoListaScreen: React.FC<Props> = ({ navigation }) => {
     const dia = String(data.getDate()).padStart(2, '0');
     return `${ano}-${mes}-${dia}`;
   };
-
-  const agendamentosFiltrados = agendamentos.filter(agendamento => {
-    // Converter a string de data do agendamento para um objeto Date
-    const dataAgendamento = new Date(agendamento.data);
-    
-    // Formatar ambas as datas para comparação
-    const dataFormatadaAgendamento = formatarDataParaComparacao(dataAgendamento);
-    const dataFormatadaSelecionada = formatarDataParaComparacao(dataSelecionada);
-    
-    // Comparar as strings formatadas
-    return dataFormatadaAgendamento === dataFormatadaSelecionada;
-  });
 
   const handleExcluirAgendamento = async (id: string) => {
     setAgendamentoParaExcluir(id);

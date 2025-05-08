@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert, Modal, Platform, ScrollView, StatusBar } from 'react-native';
 import { Card } from '../components/Card';
 import { StorageService } from '../services/storage';
@@ -37,11 +37,10 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
   const [markedDates, setMarkedDates] = useState<any>({});
   const [horariosOcupados, setHorariosOcupados] = useState<string[]>([]);
 
-  const carregarDados = async () => {
+  const carregarDados = useCallback(async () => {
     const dadosAgendamentos = await StorageService.getAgendamentos();
     setAgendamentos(dadosAgendamentos);
     
-    // Marcar datas com agendamentos
     const datasMarcadas: any = {};
     dadosAgendamentos.forEach(agendamento => {
       const dataFormatada = new Date(agendamento.data).toISOString().split('T')[0];
@@ -49,61 +48,60 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
     });
     setMarkedDates(datasMarcadas);
 
-    // Verificar horários ocupados para a data selecionada
     const dataFormatada = data.toISOString().split('T')[0];
     const horariosOcupadosNaData = dadosAgendamentos
       .filter(a => new Date(a.data).toISOString().split('T')[0] === dataFormatada)
       .map(a => a.hora);
     setHorariosOcupados(horariosOcupadosNaData);
-  };
+  }, [data]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      carregarDados();
-    }, [data])
-  );
-
-  const handleDateChange = (event: any, selectedDate?: Date) => {
+  const handleDateChange = useCallback((event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
     if (selectedDate) {
       setData(selectedDate);
-      // Atualizar horários ocupados quando a data muda
       const dataFormatada = selectedDate.toISOString().split('T')[0];
       const horariosOcupadosNaData = agendamentos
         .filter(a => new Date(a.data).toISOString().split('T')[0] === dataFormatada)
         .map(a => a.hora);
       setHorariosOcupados(horariosOcupadosNaData);
     }
-  };
+  }, [agendamentos]);
 
-  const handleTimeChange = (event: any, selectedTime?: Date) => {
+  const handleTimeChange = useCallback((event: any, selectedTime?: Date) => {
     setShowTimePicker(false);
     if (selectedTime) {
       setHora(selectedTime);
     }
-  };
+  }, []);
 
-  const handleCalendarDayPress = (day: any) => {
-    // Criar uma nova data usando a string da data selecionada
-    // Isso evita problemas de fuso horário
+  const handleCalendarDayPress = useCallback((day: any) => {
     const [ano, mes, dia] = day.dateString.split('-').map(Number);
     const selectedDate = new Date(ano, mes - 1, dia);
     setData(selectedDate);
     setShowCalendar(false);
-    // Atualizar horários ocupados quando a data muda
     const horariosOcupadosNaData = agendamentos
       .filter(a => new Date(a.data).toISOString().split('T')[0] === day.dateString)
       .map(a => a.hora);
     setHorariosOcupados(horariosOcupadosNaData);
-  };
+  }, [agendamentos]);
 
-  const handleTimeSelect = (horario: string) => {
+  const handleTimeSelect = useCallback((horario: string) => {
     const [hours, minutes] = horario.split(':').map(Number);
     const newHora = new Date();
     newHora.setHours(hours, minutes, 0, 0);
     setHora(newHora);
     setShowTimeList(false);
-  };
+  }, []);
+
+  const horariosDisponiveis = useMemo(() => {
+    return HORARIOS_DISPONIVEIS.filter(horario => !horariosOcupados.includes(horario));
+  }, [horariosOcupados]);
+
+  useFocusEffect(
+    useCallback(() => {
+      carregarDados();
+    }, [carregarDados])
+  );
 
   const formatarTelefone = (text: string) => {
     // Remove tudo que não for número
@@ -354,7 +352,7 @@ export const AgendamentoScreen: React.FC<Props> = ({ navigation }) => {
             </View>
             
             <FlatList
-              data={HORARIOS_DISPONIVEIS}
+              data={horariosDisponiveis}
               renderItem={renderTimeItem}
               keyExtractor={item => item}
               numColumns={3}
